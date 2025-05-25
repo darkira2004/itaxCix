@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Meta tags para prevenir caché -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <title>Panel de Administración - Aprobación de Conductores</title>
+
+    <link rel="stylesheet" href="../../assets/css/ControlAdmision.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Admin Panel</h2>
+                <button id="close-sidebar" class="sidebar-toggle">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="sidebar-menu">
+                <ul>
+                    <li class="active">
+                        <a href="#" class="module-admision">
+                            <i class="fas fa-users-rectangle"></i>
+                            Admisión de conductores
+                        </a>
+                    </li>
+                    <li class="has-submenu">
+                        <a href="#" class="module-tablas">
+                            <i class="fas fa-table-list"></i>
+                            Tablas maestras
+                        </a>
+                        <!--  submódulos de tablas maestras -->
+                        <ul class="submenu">
+                           <li><a href="#">Vehículos</a></li>
+                           <li><a href="#">Marcas</a></li>
+                           <li><a href="#">Modelos</a></li>
+                           <li><a href="#">Colores</a></li>
+        
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="module-auditoria">
+                            <i class="fas fa-shield-halved"></i>
+                            Auditoría
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="module-config">
+                            <i class="fas fa-sliders"></i>
+                            Configuración
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="sidebar-footer">
+                <button class="logout-btn">
+                    <i class="fas fa-power-off"></i>
+                    Cerrar sesión
+                </button>
+            </div>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="main-content">
+            <div class="top-bar">
+                <button id="open-sidebar" class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Gestionar usuario</h1>
+                <div class="user-info">
+                    <span id="user-display">Admin</span>
+                    <div class="avatar">
+                        <img src="https://via.placeholder.com/32" alt="Admin">
+                    </div>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="panel">
+                    <div id="loading-indicator" class="loading-indicator">
+                        <div class="spinner"></div>
+                        <p>Cargando conductores...</p>
+                    </div>
+                    <table class="drivers-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>DNI</th>
+                                <th>Placa</th>
+                                <th>Contacto</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="drivers-list">
+                            <!-- Los conductores se cargarán dinámicamente desde JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para detalles del conductor -->
+    <div id="driver-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Detalles del Conductor</h2>
+            
+            <div class="driver-details">
+                <div class="driver-profile">
+                    <div class="avatar-large">
+                        <img id="modal-avatar" src="https://via.placeholder.com/100" alt="Foto de perfil">
+                    </div>
+                    <h3 id="modal-name">Nombre del Conductor</h3>
+                </div>
+                
+                <div class="driver-info">
+                    <div class="info-item">
+                        <label>DNI:</label>
+                        <span id="modal-dni">12345678</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Placa:</label>
+                        <span id="modal-placa">ABC123</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Contacto:</label>
+                        <span id="modal-contacto">987654321</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Estado:</label>
+                        <span id="modal-estado">Pendiente</span>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-accept" id="modal-accept">Aceptar</button>
+                    <button class="btn btn-reject" id="modal-reject">Rechazar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast para notificaciones -->
+    <div id="toast" class="toast">
+        <div id="toast-message">Conductor aprobado exitosamente</div>
+    </div>
+
+    <!-- Script para verificar autenticación -->
+    <script>
+        // Verificar autenticación al cargar la página
+        (function() {
+            const isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
+            const token = sessionStorage.getItem("authToken");
+            
+            if (!isLoggedIn || !token) {
+                console.log("Usuario no autenticado o token no encontrado, redirigiendo al login...");
+                window.location.href = "../../index.html";
+                return;
+            }
+            
+            // Mostrar nombre de usuario (usando documentValue)
+            const documentValue = sessionStorage.getItem("documentValue");
+            const userDisplay = document.getElementById("user-display");
+            if (userDisplay) {
+                if (documentValue) {
+                    userDisplay.textContent = documentValue;
+                } else {
+                    // Fallback al userId si no hay documentValue
+                    const userId = sessionStorage.getItem("userId");
+                    if (userId) {
+                        userDisplay.textContent = "Usuario " + userId;
+                    }
+                }
+            }
+            
+            // Configurar botón de logout
+            const logoutBtn = document.querySelector('.logout-btn'); // Cambiado de getElementById a querySelector
+            if (logoutBtn) {
+                logoutBtn.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    console.log("Cerrando sesión...");
+                    
+                    // Limpiar todos los datos de sesión
+                    sessionStorage.removeItem("isLoggedIn");
+                    sessionStorage.removeItem("loginTime");
+                    sessionStorage.removeItem("authToken");
+                    sessionStorage.removeItem("userId");
+                    sessionStorage.removeItem("documentValue");
+                    sessionStorage.removeItem("userRoles");
+                    sessionStorage.removeItem("userPermissions");
+                    sessionStorage.removeItem("userAvailability");
+                    
+                    console.log("Sesión eliminada, redirigiendo...");
+                    
+                    // Redirigir al login
+                    window.location.href = "../../index.html";
+                });
+            }
+            
+            // Verificar permisos para acceder a esta página (opcional)
+            const userRolesJson = sessionStorage.getItem("userRoles");
+            if (userRolesJson) {
+                try {
+                    const userRoles = JSON.parse(userRolesJson);
+                    // Aquí puedes verificar roles específicos si es necesario
+                    // Por ejemplo:
+                    // if (!userRoles.includes("admin")) {
+                    //     console.log("Usuario sin permisos suficientes");
+                    //     window.location.href = "../../index.html";
+                    // }
+                } catch (e) {
+                    console.error("Error al verificar roles:", e);
+                }
+            }
+        })();
+        
+        // Prevenir el uso del botón de retroceso
+        window.addEventListener("pageshow", function(event) {
+            // Si la página se carga desde la caché (botón de retroceso)
+            if (event.persisted) {
+                console.log("Página cargada desde caché, verificando autenticación...");
+                const isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
+                const token = sessionStorage.getItem("authToken");
+                if (!isLoggedIn || !token) {
+                    window.location.href = "../../index.html";
+                }
+            }
+        });
+        
+        // Función para verificar si el token ha expirado (opcional)
+        function checkTokenExpiration() {
+            const loginTime = sessionStorage.getItem("loginTime");
+            if (!loginTime) return false;
+            
+            const now = Date.now();
+            const sessionTime = Number.parseInt(loginTime);
+            const sessionDuration = 30 * 60 * 1000; // 30 minutos en milisegundos
+            
+            if (now - sessionTime > sessionDuration) {
+                console.log("Sesión expirada, redirigiendo al login...");
+                
+                // Limpiar todos los datos de sesión
+                sessionStorage.removeItem("isLoggedIn");
+                sessionStorage.removeItem("loginTime");
+                sessionStorage.removeItem("authToken");
+                sessionStorage.removeItem("userId");
+                sessionStorage.removeItem("documentValue");
+                sessionStorage.removeItem("userRoles");
+                sessionStorage.removeItem("userPermissions");
+                sessionStorage.removeItem("userAvailability");
+                
+                // Redirigir al login
+                window.location.href = "../../index.html";
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Verificar expiración del token periódicamente
+        setInterval(checkTokenExpiration, 60000); // Verificar cada minuto
+    </script>
+
+    <!-- Cargar scripts en el orden correcto -->
+    <script src="../../assets/js/api/models/conductor.js"></script>
+    <script src="../../assets/js/api/services/conductor-service.js"></script>
+    <script src="../../assets/js/ui/controllers/ui-controller.js"></script>
+
+    <script>
+        // Inicializar la aplicación cuando el DOM esté cargado
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar autenticación antes de inicializar
+            if (sessionStorage.getItem("isLoggedIn") === "true" && sessionStorage.getItem("authToken")) {
+                const app = new UIController();
+                app.init();
+            }
+        });
+    </script>
+    <script>
+    // Submenú desplegable para Tablas maestras
+    document.addEventListener('DOMContentLoaded', function() {
+        const submenuParent = document.querySelector('.sidebar-menu .has-submenu > a');
+        submenuParent.addEventListener('click', function(e) {
+            e.preventDefault();
+            this.parentElement.classList.toggle('open');
+        });
+    });
+</script>
+    
+</body>
+</html>
