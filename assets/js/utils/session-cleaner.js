@@ -2,39 +2,46 @@
  * Maneja la limpieza de sesión y navegación
  */
 function clearSession() {
-    // Limpiar todo el sessionStorage
+    // Limpiar sessionStorage
     sessionStorage.clear();
     
-    // Prevenir navegación hacia atrás
-    window.history.pushState(null, '', window.location.href);
-    window.onpopstate = function () {
-        window.history.pushState(null, '', window.location.href);
-    };
-
-    // Redirigir solo si no estamos en el login y hay una sesión previa
-    const currentPath = window.location.pathname;
-    if (!currentPath.includes('index.html') && !sessionStorage.getItem('isLoggedIn')) {
-        console.log('Sesión no válida, redirigiendo al login...');
-        window.location.replace('../../index.html');
+    // Forzar redirección al login si no hay sesión válida
+    if (!window.location.pathname.includes('index.html')) {
+        window.location.replace('/index.html');
     }
 }
 
-// Verificar autenticación al cargar cualquier página
-document.addEventListener('DOMContentLoaded', function() {
-    // Si estamos en el login, solo limpiar la sesión
-    if (window.location.pathname.includes('index.html')) {
-        sessionStorage.clear();
-        return;
-    }
+// Prevenir navegación hacia atrás
+function preventBackNavigation() {
+    window.history.pushState(null, '', window.location.href);
+    window.onpopstate = function() {
+        window.history.pushState(null, '', window.location.href);
+        checkSession();
+    };
+}
 
-    // Para otras páginas, verificar autenticación
+// Verificar estado de la sesión
+function checkSession() {
     const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
-    const hasToken = sessionStorage.getItem('authToken');
-    
-    if (!isLoggedIn || !hasToken) {
+    const token = sessionStorage.getItem('authToken');
+    const loginTime = sessionStorage.getItem('loginTime');
+
+    // Si no hay sesión válida y no estamos en login, redirigir
+    if ((!isLoggedIn || !token || !loginTime) && !window.location.pathname.includes('index.html')) {
         clearSession();
+        return false;
     }
+    return true;
+}
+
+// Inicializar protección de navegación
+document.addEventListener('DOMContentLoaded', function() {
+    preventBackNavigation();
+    checkSession();
 });
 
-// Exportar la función para uso en otros archivos
+// Verificar sesión periódicamente
+setInterval(checkSession, 5000);
+
 window.clearSession = clearSession;
+window.checkSession = checkSession;

@@ -45,7 +45,10 @@ class LoginController {
             const response = await this.loginService.verifyCredentials(documentValue, password);
             
             if (response.success && response.data) {
-                // Guardar datos de sesión usando la estructura exacta de AuthLoginResponseDTO
+                // Limpiar cualquier sesión anterior
+                sessionStorage.clear();
+                
+                // Guardar datos de sesión
                 sessionStorage.setItem("isLoggedIn", "true");
                 sessionStorage.setItem("authToken", response.data.token);
                 sessionStorage.setItem("userId", response.data.userId.toString());
@@ -55,7 +58,8 @@ class LoginController {
                 sessionStorage.setItem("userAvailability", response.data.availability?.toString() ?? "true");
                 sessionStorage.setItem("loginTime", Date.now().toString());
 
-                // Redirigir al panel
+                // Prevenir navegación hacia atrás antes de redirigir
+                window.history.pushState(null, '', window.location.href);
                 window.location.replace("pages/usuarios/ControlAdmisionConductores.html");
             } else {
                 this.showError(response.message || "Error de autenticación");

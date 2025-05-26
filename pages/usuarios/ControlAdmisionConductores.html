@@ -195,5 +195,12 @@
     
     <!-- 5. Utilidades de sesión -->
     <script src="../../assets/js/utils/session-cleaner.js"></script>
+    
+    <script>
+        // Verificar autenticación al cargar
+        if (!window.checkSession()) {
+            window.location.replace('/index.html');
+        }
+    </script>
 </body>
 </html>
