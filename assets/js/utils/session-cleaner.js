@@ -12,9 +12,14 @@ function clearSession() {
     // Limpiar sessionStorage
     sessionStorage.clear();
     
-    // Forzar redirección al login con la ruta base correcta
+    // Construir la URL completa para GitHub Pages
+    const loginUrl = window.location.hostname.includes('github.io')
+        ? `${window.location.protocol}//${window.location.host}${BASE_URL}/index.html`
+        : '/index.html';
+    
+    // Forzar redirección al login con la ruta completa
     if (!window.location.pathname.includes('index.html')) {
-        window.location.replace(`${BASE_URL}/index.html`);
+        window.location.replace(loginUrl);
     }
 }
 
@@ -26,6 +31,11 @@ function checkSession() {
     const token = sessionStorage.getItem('authToken');
     const loginTime = sessionStorage.getItem('loginTime');
 
+    // Construir la URL completa para GitHub Pages
+    const loginUrl = window.location.hostname.includes('github.io')
+        ? `${window.location.protocol}//${window.location.host}${BASE_URL}/index.html`
+        : '/index.html';
+
     // Si no hay sesión válida y no estamos en login, redirigir
     if ((!isLoggedIn || !token || !loginTime) && !window.location.pathname.includes('index.html')) {
         clearSession();
@@ -36,7 +46,7 @@ function checkSession() {
     window.history.pushState(null, '', window.location.href);
     window.onpopstate = function() {
         window.history.pushState(null, '', window.location.href);
-        window.location.replace(`${BASE_URL}/index.html`);
+        window.location.replace(loginUrl);
     };
 
     return true;
