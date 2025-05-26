@@ -6,6 +6,9 @@ class LoginController {
         this.btnText = this.submitBtn.querySelector('.btn-text');
         this.btnLoading = this.submitBtn.querySelector('.btn-loading');
         this.loginService = window.LoginService;
+        this.baseUrl = window.location.hostname.includes('github.io') 
+            ? '/itaxCix'
+            : '';
         this.init();
     }
 
@@ -60,7 +63,8 @@ class LoginController {
 
                 // Prevenir navegación hacia atrás antes de redirigir
                 window.history.pushState(null, '', window.location.href);
-                window.location.replace("pages/usuarios/ControlAdmisionConductores.html");
+                // Usar la ruta base correcta para la redirección
+                window.location.replace(`${this.baseUrl}/pages/usuarios/ControlAdmisionConductores.html`);
             } else {
                 this.showError(response.message || "Error de autenticación");
             }

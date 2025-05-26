@@ -1,26 +1,26 @@
 /**
+ * Configuración de rutas base según el entorno
+ */
+const BASE_URL = window.location.hostname.includes('github.io') 
+    ? '/itaxCix'  // Ruta base para GitHub Pages
+    : '';         // Ruta base para desarrollo local
+
+/**
  * Maneja la limpieza de sesión y navegación
  */
 function clearSession() {
     // Limpiar sessionStorage
     sessionStorage.clear();
     
-    // Forzar redirección al login si no hay sesión válida
+    // Forzar redirección al login con la ruta base correcta
     if (!window.location.pathname.includes('index.html')) {
-        window.location.replace('/index.html');
+        window.location.replace(`${BASE_URL}/index.html`);
     }
 }
 
-// Prevenir navegación hacia atrás
-function preventBackNavigation() {
-    window.history.pushState(null, '', window.location.href);
-    window.onpopstate = function() {
-        window.history.pushState(null, '', window.location.href);
-        checkSession();
-    };
-}
-
-// Verificar estado de la sesión
+/**
+ * Verifica el estado de la sesión
+ */
 function checkSession() {
     const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
     const token = sessionStorage.getItem('authToken');
@@ -31,17 +31,23 @@ function checkSession() {
         clearSession();
         return false;
     }
+
+    // Prevenir navegación hacia atrás
+    window.history.pushState(null, '', window.location.href);
+    window.onpopstate = function() {
+        window.history.pushState(null, '', window.location.href);
+        window.location.replace(`${BASE_URL}/index.html`);
+    };
+
     return true;
 }
 
-// Inicializar protección de navegación
-document.addEventListener('DOMContentLoaded', function() {
-    preventBackNavigation();
-    checkSession();
-});
+// Inicializar verificación de sesión
+document.addEventListener('DOMContentLoaded', checkSession);
 
 // Verificar sesión periódicamente
 setInterval(checkSession, 5000);
 
+// Exportar funciones
 window.clearSession = clearSession;
 window.checkSession = checkSession;
