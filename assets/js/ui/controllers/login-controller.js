@@ -1,131 +1,83 @@
-// Función para manejar el inicio de sesión
-function setupLoginForm() {
-  console.log("Configurando formulario de login...");
+class LoginController {
+    constructor() {
+        this.form = document.getElementById('login-form');
+        this.errorMsg = document.getElementById('error-msg');
+        this.submitBtn = this.form.querySelector('.btn-ingresar');
+        this.btnText = this.submitBtn.querySelector('.btn-text');
+        this.btnLoading = this.submitBtn.querySelector('.btn-loading');
+        this.loginService = window.LoginService;
+        this.init();
+    }
 
-  // Verificar que LoginService esté disponible
-  if (typeof LoginService === "undefined") {
-    console.error(
-      "Error: LoginService no está definido. Asegúrate de cargar login-service.js antes que login-controller.js",
-    );
-    return;
-  }
+    init() {
+        // Prevenir comportamiento por defecto del formulario
+        this.form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await this.handleLogin();
+        });
 
-  const apiService = new LoginService(); // Usar el servicio de API
-  const loginForm = document.querySelector(".login-form");
-  const errorMsg = document.getElementById("error-msg");
-  const usernameInput = document.getElementById("username");
-  const passwordInput = document.getElementById("password");
-
-  if (loginForm) {
-    loginForm.addEventListener("submit", async function (e) {
-      e.preventDefault(); // Prevenir el envío del formulario
-      console.log("Formulario enviado");
-
-      const username = usernameInput.value.trim();
-      const password = passwordInput.value.trim();
-      console.log(`Intentando login con usuario: ${username}`);
-
-      // Mostrar indicador de carga (opcional)
-      const submitButton = this.querySelector('button[type="submit"]');
-      const originalButtonText = submitButton.textContent;
-      submitButton.textContent = "Verificando...";
-      submitButton.disabled = true;
-
-      try {
-        // Intentar iniciar sesión usando el servicio de API
-        console.log("Verificando credenciales...");
-        const authData = await apiService.verifyCredentials(username, password);
-
-        // Verificar si la respuesta contiene datos de autenticación
-        if (authData && authData.token) {
-          console.log("Login exitoso, token recibido");
-          
-          // Guardar el token en sessionStorage
-          sessionStorage.setItem("authToken", authData.token);
-          
-          // Guardar la sesión
-          sessionStorage.setItem("isLoggedIn", "true");
-          sessionStorage.setItem("loginTime", Date.now().toString());
-          
-          // Guardar datos adicionales del usuario
-          sessionStorage.setItem("userId", authData.userId.toString());
-          sessionStorage.setItem("documentValue", authData.documentValue);
-          
-          // Guardar roles y permisos
-          if (authData.roles && authData.roles.length > 0) {
-            sessionStorage.setItem("userRoles", JSON.stringify(authData.roles));
-          }
-          
-          if (authData.permissions && authData.permissions.length > 0) {
-            sessionStorage.setItem("userPermissions", JSON.stringify(authData.permissions));
-          }
-          
-          // Guardar disponibilidad si existe
-          if (authData.availability !== null) {
-            sessionStorage.setItem("userAvailability", authData.availability.toString());
-          }
-
-          // Redirigir al panel de administración
-          window.location.href = "pages/usuarios/ControlAdmisionConductores.html";
-        } else {
-          console.log("Credenciales incorrectas o respuesta inválida");
-          // Mostrar mensaje de error
-          errorMsg.style.display = "block";
-          passwordInput.value = ""; // Limpiar contraseña por seguridad
+        // Configurar toggle de contraseña
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', () => {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                togglePassword.classList.toggle('fa-eye');
+                togglePassword.classList.toggle('fa-eye-slash');
+            });
         }
-      } catch (error) {
-        console.error("Error al iniciar sesión:", error);
-        errorMsg.textContent = "Error al conectar con el servidor";
-        errorMsg.style.display = "block";
-      } finally {
-        // Restaurar el botón
-        submitButton.textContent = originalButtonText;
-        submitButton.disabled = false;
-      }
-    });
-    console.log("Formulario de login configurado correctamente");
-  } else {
-    console.warn("No se encontró el formulario de login");
-  }
+    }
+
+    setLoading(isLoading) {
+        this.submitBtn.disabled = isLoading;
+        this.btnText.style.display = isLoading ? 'none' : 'inline';
+        this.btnLoading.style.display = isLoading ? 'inline' : 'none';
+    }
+
+    async handleLogin() {
+        const documentValue = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            this.setLoading(true);
+            const response = await this.loginService.verifyCredentials(documentValue, password);
+            
+            if (response.success && response.data) {
+                // Guardar datos de sesión usando la estructura exacta de AuthLoginResponseDTO
+                sessionStorage.setItem("isLoggedIn", "true");
+                sessionStorage.setItem("authToken", response.data.token);
+                sessionStorage.setItem("userId", response.data.userId.toString());
+                sessionStorage.setItem("documentValue", response.data.documentValue);
+                sessionStorage.setItem("userRoles", JSON.stringify(response.data.roles));
+                sessionStorage.setItem("userPermissions", JSON.stringify(response.data.permissions));
+                sessionStorage.setItem("userAvailability", response.data.availability?.toString() ?? "true");
+                sessionStorage.setItem("loginTime", Date.now().toString());
+
+                // Redirigir al panel
+                window.location.replace("pages/usuarios/ControlAdmisionConductores.html");
+            } else {
+                this.showError(response.message || "Error de autenticación");
+            }
+        } catch (error) {
+            console.error('Error durante el login:', error);
+            this.showError("Error en el servidor");
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    showError(message) {
+        this.errorMsg.textContent = message;
+        this.errorMsg.style.display = 'block';
+        setTimeout(() => {
+            this.errorMsg.style.display = 'none';
+        }, 3000);
+    }
 }
 
-// Inicializar cuando el DOM esté cargado
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("DOM cargado, inicializando aplicación...");
-  setupPasswordToggle();
-  setupLoginForm();
-  setupForgotPassword();
+// Inicializar el controlador cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+    new LoginController();
 });
-
-// Función para mostrar/ocultar contraseña
-function setupPasswordToggle() {
-  console.log("Configurando toggle de contraseña...");
-  const togglePassword = document.getElementById("togglePassword");
-  const password = document.getElementById("password");
-
-  if (togglePassword && password) {
-    togglePassword.addEventListener("click", function () {
-      // Cambiar el tipo de input
-      const type = password.getAttribute("type") === "password" ? "text" : "password";
-      password.setAttribute("type", type);
-
-      // Cambiar el icono
-      this.classList.toggle("fa-eye");
-      this.classList.toggle("fa-eye-slash");
-    });
-    console.log("Toggle de contraseña configurado correctamente");
-  } else {
-    console.warn("No se encontraron los elementos para el toggle de contraseña");
-  }
-}
-
-// Función para configurar el enlace de contraseña olvidada
-function setupForgotPassword() {
-  const forgotPasswordLink = document.querySelector(".contraseña-olvidada");
-
-  if (forgotPasswordLink) {
-    forgotPasswordLink.addEventListener("click", () => {
-      alert("Funcionalidad de recuperación de contraseña en desarrollo. Por favor contacte al administrador.");
-    });
-  }
-}

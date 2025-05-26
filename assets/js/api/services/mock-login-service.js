@@ -5,29 +5,41 @@ class MockLoginService {
     console.log("Inicializando servicio de login simulado");
   }
 
-  async verifyCredentials(username, password) {
-    console.log(`Simulando verificación de credenciales para: ${username}`);
-    
-    // Simular un retraso de red
+  async verifyCredentials(documentValue, password) {
+    console.log('Enviando request a la API:', {
+        documentValue,
+        password,
+        web: true
+    });
+
+    // Simular delay de red
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Credenciales de prueba
-    if (username === "73605624" && password === "1234asdA@") {
-      console.log("Credenciales válidas, generando respuesta simulada");
-      
-      // Simular la respuesta de la API
-      return {
-        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlVzdWFyaW8gZGUgUHJ1ZWJhIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-        userId: 12345,
-        documentValue: "73605624",
-        roles: ["admin", "user"],
-        permissions: ["read", "write", "approve_drivers"],
-        availability: true
-      };
-    } else {
-      console.log("Credenciales inválidas");
-      return null;
+
+    // Simular respuesta de la API
+    if (documentValue === "73605624" && password === "1234asdA@") {
+        return {
+            success: true,
+            message: "Login exitoso",
+            data: {
+                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                userId: 12345,
+                documentValue: "73605624",
+                roles: ["admin"],
+                permissions: ["read", "write", "approve_drivers"],
+                availability: true
+            },
+            error: null,
+            timestamp: new Date().toISOString()
+        };
     }
+
+    return {
+        success: false,
+        message: "Credenciales inválidas",
+        data: null,
+        error: ["Credenciales incorrectas"],
+        timestamp: new Date().toISOString()
+    };
   }
 
   // Método para simular peticiones autenticadas
@@ -52,10 +64,5 @@ class MockLoginService {
   }
 }
 
-// Exportar la clase para que esté disponible en otros archivos
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = MockLoginService;
-} else {
-  // Para navegadores sin soporte de módulos
-  window.LoginService = MockLoginService;
-}
+// Exportar la clase para uso global
+window.LoginService = new MockLoginService();

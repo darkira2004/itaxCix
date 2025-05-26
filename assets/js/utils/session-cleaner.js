@@ -1,23 +1,40 @@
+/**
+ * Maneja la limpieza de sesión y navegación
+ */
 function clearSession() {
-    sessionStorage.removeItem("isLoggedIn");
-    sessionStorage.removeItem("username");
-    sessionStorage.removeItem("loginTime");
-    sessionStorage.removeItem("authToken");
-    sessionStorage.removeItem("userId");
-    sessionStorage.removeItem("documentValue");
-    sessionStorage.removeItem("userRoles");
-    sessionStorage.removeItem("userPermissions");
-    sessionStorage.removeItem("userAvailability");
-    console.log("Sesión limpiada");
+    // Limpiar todo el sessionStorage
+    sessionStorage.clear();
+    
+    // Prevenir navegación hacia atrás
+    window.history.pushState(null, '', window.location.href);
+    window.onpopstate = function () {
+        window.history.pushState(null, '', window.location.href);
+    };
+
+    // Redirigir solo si no estamos en el login y hay una sesión previa
+    const currentPath = window.location.pathname;
+    if (!currentPath.includes('index.html') && !sessionStorage.getItem('isLoggedIn')) {
+        console.log('Sesión no válida, redirigiendo al login...');
+        window.location.replace('../../index.html');
+    }
 }
 
-// Inicialización al cargar la página
+// Verificar autenticación al cargar cualquier página
 document.addEventListener('DOMContentLoaded', function() {
-    clearSession();
+    // Si estamos en el login, solo limpiar la sesión
+    if (window.location.pathname.includes('index.html')) {
+        sessionStorage.clear();
+        return;
+    }
+
+    // Para otras páginas, verificar autenticación
+    const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+    const hasToken = sessionStorage.getItem('authToken');
     
-    // Mostrar credenciales de prueba en la consola
-    console.log("=== CREDENCIALES DE PRUEBA ===");
-    console.log("Documento: 73605624");
-    console.log("Contraseña: 1234asdA@");
-    console.log("===========================");
+    if (!isLoggedIn || !hasToken) {
+        clearSession();
+    }
 });
+
+// Exportar la función para uso en otros archivos
+window.clearSession = clearSession;
