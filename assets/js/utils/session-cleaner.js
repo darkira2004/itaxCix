@@ -1,40 +1,30 @@
-/**
- * Maneja la limpieza de sesión y navegación
- */
-function clearSession() {
-    // Limpiar todo el sessionStorage
+function clearSession() {  // Limpiar sessionStorage
     sessionStorage.clear();
     
     // Prevenir navegación hacia atrás
-    window.history.pushState(null, '', window.location.href);
-    window.onpopstate = function () {
-        window.history.pushState(null, '', window.location.href);
-    };
-
-    // Redirigir solo si no estamos en el login y hay una sesión previa
-    const currentPath = window.location.pathname;
-    if (!currentPath.includes('index.html') && !sessionStorage.getItem('isLoggedIn')) {
-        console.log('Sesión no válida, redirigiendo al login...');
+    window.history.forward();
+    
+    // Verificar si estamos en una página protegida
+    if (!window.location.href.includes('index.html')) {
         window.location.replace('../../index.html');
     }
 }
 
-// Verificar autenticación al cargar cualquier página
-document.addEventListener('DOMContentLoaded', function() {
-    // Si estamos en el login, solo limpiar la sesión
-    if (window.location.pathname.includes('index.html')) {
-        sessionStorage.clear();
-        return;
-    }
-
-    // Para otras páginas, verificar autenticación
-    const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
-    const hasToken = sessionStorage.getItem('authToken');
-    
-    if (!isLoggedIn || !hasToken) {
-        clearSession();
+// Agregar listeners para eventos de navegación
+window.addEventListener('popstate', function(event) {
+    // Si no estamos en la página de login, redirigir
+    if (!window.location.href.includes('index.html')) {
+        window.location.replace('../../index.html');
     }
 });
 
-// Exportar la función para uso en otros archivos
-window.clearSession = clearSession;
+// Verificar estado de autenticación al cargar
+document.addEventListener('DOMContentLoaded', function() {
+    clearSession();
+    
+    // Mostrar credenciales de prueba en la consola
+    console.log("=== CREDENCIALES DE PRUEBA ===");
+    console.log("Documento: 73605624");
+    console.log("Contraseña: 1234asdA@");
+    console.log("===========================");
+    });
