@@ -43,30 +43,7 @@
 </div>
 
 <!-- Cargar el archivo JavaScript externo -->
-<script>
-// Limpiar cualquier sesión existente al cargar la página de login
-document.addEventListener('DOMContentLoaded', function() {
-  // Limpiar la sesión al cargar la página de login
-  sessionStorage.removeItem("isLoggedIn");
-  sessionStorage.removeItem("username");
-  sessionStorage.removeItem("loginTime");
-  sessionStorage.removeItem("authToken");
-  sessionStorage.removeItem("userId");
-  sessionStorage.removeItem("documentValue");
-  sessionStorage.removeItem("userRoles");
-  sessionStorage.removeItem("userPermissions");
-  sessionStorage.removeItem("userAvailability");
-  
-  console.log("Sesión limpiada al cargar la página de login");
-  
-  // Mostrar credenciales de prueba en la consola
-  console.log("=== CREDENCIALES DE PRUEBA ===");
-  console.log("Documento: 73605624");
-  console.log("Contraseña: 1234asdA@");
-  console.log("===========================");
-});
-</script>
-<!-- Cargar el servicio simulado en lugar del real -->
+<script src="assets/js/utils/session-cleaner.js"></script>
 <script src="assets/js/api/services/mock-login-service.js"></script>
 <script src="assets/js/ui/controllers/login-controller.js"></script>
 
