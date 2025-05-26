@@ -2,12 +2,7 @@ function clearSession() {  // Limpiar sessionStorage
     sessionStorage.clear();
     
     // Prevenir navegación hacia atrás
-    window.history.forward();
-    
-    // Verificar si estamos en una página protegida
-    if (!window.location.href.includes('index.html')) {
-        window.location.replace('../../index.html');
-    }
+     window.history.forward();
 }
 
 // Agregar listeners para eventos de navegación
@@ -22,9 +17,9 @@ window.addEventListener('popstate', function(event) {
 document.addEventListener('DOMContentLoaded', function() {
     clearSession();
     
-    // Mostrar credenciales de prueba en la consola
+    // Mostrar credenciales de prueba en laz consola
     console.log("=== CREDENCIALES DE PRUEBA ===");
     console.log("Documento: 73605624");
     console.log("Contraseña: 1234asdA@");
     console.log("===========================");
-    });
+});
