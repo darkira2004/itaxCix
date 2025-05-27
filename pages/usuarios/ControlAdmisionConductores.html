@@ -13,6 +13,7 @@
     <title>Panel de Administración - Aprobación de Conductores</title>
 
     <!-- Hojas de estilo -->
+    <link rel="stylesheet" href="../../assets/css/sidebar.css">
     <link rel="stylesheet" href="../../assets/css/ControlAdmision.css">
     <!-- Font Awesome para iconografía -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -41,18 +42,18 @@
                         </a>
                     </li>
 
-                    <!-- Módulo de Tablas maestras con submenú -->
+                    <!-- Módulo de Tablas maestras -->
                     <li class="has-submenu">
                         <a href="#" class="module-tablas">
-                            <i class="fas fa-table-list"></i>
+                            <i class="fa-solid fa-table-list"></i>
                             Tablas maestras
+                            <span class="submenu-arrow"></span>
                         </a>
-                        <!-- Submenú de tablas maestras -->
                         <ul class="submenu">
-                           <li><a href="#">Vehículos</a></li>
-                           <li><a href="#">Marcas</a></li>
-                           <li><a href="#">Modelos</a></li>
-                           <li><a href="#">Colores</a></li>
+                            <li><a href="#"><i class="fas fa-car"></i> Vehículos</a></li>
+                            <li><a href="#"><i class="fas fa-tag"></i> Marcas</a></li>
+                            <li><a href="#"><i class="fas fa-boxes"></i> Modelos</a></li>
+                            <li><a href="#"><i class="fas fa-palette"></i> Colores</a></li>
                         </ul>
                     </li>
 
@@ -63,7 +64,6 @@
                             Auditoría
                         </a>
                     </li>
-
                     <!-- Módulo de Configuración -->
                     <li>
                         <a href="#" class="module-config">
@@ -94,7 +94,7 @@
                 <div class="user-info">
                     <span id="user-display">Admin</span>
                     <div class="avatar">
-                        <img src="https://via.placeholder.com/32" alt="Admin">
+                        <img src="#" alt="Admin">
                     </div>
                 </div>
             </div>
@@ -189,8 +189,9 @@
     <script src="../../assets/js/api/services/conductor-service.js"></script>
     
     <!-- 4. Controladores de UI -->
-    <script src="../../assets/js/ui/controllers/ui-controller.js"></script>
     <script src="../../assets/js/ui/controllers/sidebar-controller.js"></script>
+    <script src="../../assets/js/ui/controllers/ui-controller.js"></script>
+
     <script src="../../assets/js/ui/controllers/app-initializer.js"></script>
     
     <!-- 5. Utilidades de sesión -->

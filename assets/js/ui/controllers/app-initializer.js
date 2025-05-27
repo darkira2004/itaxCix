@@ -3,12 +3,18 @@ class AppInitializer {
         if (authChecker.checkAuthentication()) {
             authChecker.updateUserDisplay();
             authChecker.setupLogoutButton();
-            
-            // Inicializar controladores
-            new SidebarController();
-            const app = new UIController();
-            app.init();
-            
+
+            // Inicializar controladores solo si no están inicializados
+            if (!window.sidebarControllerInstance) {
+                window.sidebarControllerInstance = new SidebarController();
+            }
+
+            if (!window.uiControllerInstance) {
+                const app = new UIController();
+                app.init();
+                window.uiControllerInstance = app;
+            }
+
             // Configurar verificación de sesión
             setInterval(authChecker.checkTokenExpiration, 60000);
         }

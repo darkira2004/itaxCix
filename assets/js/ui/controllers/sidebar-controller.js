@@ -2,13 +2,12 @@ class SidebarController {
     constructor() {
         this.sidebar = document.getElementById('sidebar');
         this.closeButton = document.getElementById('close-sidebar');
-        this.submenuParent = document.querySelector('.sidebar-menu .has-submenu > a');
+        this.logoutButton = document.querySelector('.logout-btn');
         this.init();
     }
 
     init() {
         this.setupEventListeners();
-        this.setupSubmenuHandlers();
     }
 
     setupEventListeners() {
@@ -18,40 +17,35 @@ class SidebarController {
                 this.sidebar.classList.toggle('collapsed');
             });
         }
-
-        // Cerrar sidebar al hacer click fuera
-        document.addEventListener('click', (e) => {
-            if (!this.sidebar.contains(e.target) && 
-                !e.target.matches('.sidebar-toggle') && 
-                window.innerWidth <= 768) {
-                this.sidebar.classList.add('collapsed');
-            }
-        });
-    }
-
-    setupSubmenuHandlers() {
-        // Manejador para submenús
-        if (this.submenuParent) {
-            this.submenuParent.addEventListener('click', (e) => {
+        // Manejador del submenu
+        const tablasLink = document.querySelector('.module-tablas');
+        if (tablasLink) {
+            tablasLink.addEventListener('click', (e) => {
                 e.preventDefault();
-                const parentLi = this.submenuParent.parentElement;
-                
-                // Cerrar otros submenús abiertos
-                const otherOpenMenus = document.querySelectorAll('.sidebar-menu .has-submenu.open');
-                otherOpenMenus.forEach(menu => {
-                    if (menu !== parentLi) {
-                        menu.classList.remove('open');
-                    }
-                });
+                e.stopPropagation(); // <-- Añade esto
+                const submenuParent = tablasLink.closest('.has-submenu');
+                if (submenuParent) {
+                    submenuParent.classList.toggle('open');
+                }
+            }, { once: false }); // Asegura que no se registre solo una vez
+        }
 
-                // Toggle del submenú actual
-                parentLi.classList.toggle('open');
+        // Evento para cerrar sesión
+        if (this.logoutButton) {
+            this.logoutButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Limpia el almacenamiento y redirige al login
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = '/index.html';
             });
         }
     }
 }
 
-// Inicializar el controlador cuando el DOM esté listo
+// Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
-    new SidebarController();
+    if (!window.sidebarControllerInstance) { // Evita doble inicialización
+        window.sidebarControllerInstance = new SidebarController();
+    }
 });

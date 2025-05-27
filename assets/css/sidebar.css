@@ -1,0 +1,215 @@
+/* Sidebar principal */
+.sidebar {
+    width: 250px;
+    background: linear-gradient(180deg, #26406b 0%, #1a2d4c 100%);
+    color: #ecf0f1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: fixed;
+    left: 0; /* Cambiamos transform por left */
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: left 0.3s ease; /* Cambiamos la transición */
+}
+
+/* Encabezado del sidebar */
+.sidebar-header {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 25px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Menú del sidebar */
+.sidebar-menu {
+    flex: 1;
+    padding: 20px 0;
+    overflow-y: auto; /* Permite desplazamiento si es necesario */
+}
+
+.sidebar-menu ul {
+    list-style: none;
+}
+
+.sidebar-menu li {
+    margin-bottom: 5px;
+}
+
+.sidebar-menu li a {
+    display: flex;
+    align-items: center;
+    margin: 8px 12px;
+    border-radius: 12px;
+    padding: 12px 20px;
+    color: #ecf0f1;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-menu li a i {
+    margin-right: 12px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.sidebar-menu li a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+}
+
+.sidebar-menu li.active a {
+    background: #3498db;
+    box-shadow: 0 4px 6px -1px rgba(52, 152, 219, 0.2);
+}
+
+/* Submenú */
+.sidebar-menu .submenu {
+    display: none;
+    padding-left: 5px; /* Más desplazamiento a la derecha */
+    margin-right: 20px;
+    width: 170px;
+    margin-left: 35px;   /* Opcional: separa aún más del borde */
+    background: rgba(65, 96, 146, 0.322); /* Fondo azul oscuro translúcido */
+    border-radius: 15px;
+}
+
+.sidebar-menu .has-submenu.open > .submenu {
+    display: block;
+}
+
+.sidebar-menu .submenu li a {
+    padding: 8px 12px 8px 5px; /* Más espacio a la izquierda para el icono */
+    margin-right:20px;
+    margin-left:20px; /* Más espacio a la izquierda para el icono */;
+}
+
+.sidebar-menu .submenu li a:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+/* Flecha para el submenú */
+.sidebar-menu .has-submenu > a .submenu-arrow {
+    display: inline-block;
+    margin-left: auto;
+    border: solid #ecf0f1;
+    border-width: 0 2.5px 2.5px 0;
+    padding: 4px;
+    transform: rotate(45deg);
+    transition: transform 0.2s;
+    margin-right: 4px;
+}
+
+/* Girar flecha cuando el submenú está abierto */
+.sidebar-menu .has-submenu.open > a .submenu-arrow {
+    transform: rotate(-135deg);
+}
+
+/* Pie del sidebar */
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.logout-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    color: rgba(255, 255, 255, 0.95);
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* Ajuste para el botón hamburguesa */
+.sidebar-toggle {
+    display: none; /* Oculto por defecto */
+    background: none;
+    border: none;
+    color: #333;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 10px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .sidebar {
+        left: -250px;
+        transition: left 0.3s ease;
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    /* Solo mostrar el botón hamburguesa en pantallas pequeñas */
+    .sidebar-toggle {
+        display: block;
+    }
+
+    /* Ocultar el botón de cierre cuando el sidebar está cerrado */
+    #close-sidebar {
+        display: none;
+    }
+
+    .sidebar.active #close-sidebar {
+        display: block;
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    /* Fondo oscuro cuando el menú está abierto en móvil */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 99;
+    }
+
+    .sidebar-overlay.active {
+        display: block;
+    }
+}
+
+/* Ajustes para pantallas muy pequeñas */
+@media (max-width: 576px) {
+    .sidebar {
+        width: 100%;
+        left: -100%; /* Usamos porcentaje para pantallas pequeñas */
+    }
+
+    .sidebar.active {
+        left: 0;
+        width: 100%;
+    }
+}
