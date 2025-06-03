@@ -36,7 +36,7 @@
                 <ul>
                     <!-- Módulo de Admisión de conductores -->
                     <li class="active">
-                        <a href="#" class="module-admision">
+                        <a class="module-admision" href="javascript:void(0)">
                             <i class="fas fa-users-rectangle"></i>
                             Admisión de conductores
                         </a>
@@ -196,12 +196,6 @@
     
     <!-- 5. Utilidades de sesión -->
     <script src="../../assets/js/utils/session-cleaner.js"></script>
-    
-    <script>
-        // Verificar autenticación al cargar
-        if (!window.checkSession()) {
-            window.location.replace('/index.html');
-        }
-    </script>
+    <script src="../../assets/js/utils/auth-checker.js"></script>
 </body>
 </html>

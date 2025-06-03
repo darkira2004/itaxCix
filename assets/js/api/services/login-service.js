@@ -2,7 +2,7 @@
 class LoginService {
   constructor() {
     // URL base para la API real
-    this.baseUrl = "https://tu-api-real.com/api" // Cambia esto a tu URL real
+    this.baseUrl = "https://149.130.161.148/api/v1" // Cambia esto a tu URL real
   }
 
   // Método para verificar credenciales de login
