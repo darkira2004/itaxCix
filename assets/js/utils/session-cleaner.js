@@ -1,25 +1,30 @@
-function clearSession() {  // Limpiar sessionStorage
-    sessionStorage.clear();
-    
-    // Prevenir navegación hacia atrás
-     window.history.forward();
+// Limpia todas las claves relevantes de sessionStorage y previene navegación hacia atrás tras cerrar sesión
+function clearSession() {
+    // Elimina solo las claves relacionadas con la sesión
+    sessionStorage.removeItem('isLoggedIn');
+    sessionStorage.removeItem('authToken');
+    sessionStorage.removeItem('loginTime');
+    sessionStorage.removeItem('documentValue');
+    sessionStorage.removeItem('userId');
+    // Si tienes más claves de sesión, agrégalas aquí
+
+    // Previene que el usuario navegue hacia atrás a páginas protegidas
+    window.location.replace('../../index.html');
 }
 
-// Agregar listeners para eventos de navegación
+// Listener para eventos de navegación hacia atrás (popstate)
 window.addEventListener('popstate', function(event) {
-    // Si no estamos en la página de login, redirigir
-    if (!window.location.href.includes('index.html')) {
+    // Si no hay sesión activa, redirige al login
+    const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+    const token = sessionStorage.getItem('authToken');
+    if (!isLoggedIn || !token) {
         window.location.replace('../../index.html');
     }
 });
 
-// Verificar estado de autenticación al cargar
-document.addEventListener('DOMContentLoaded', function() {
-    clearSession();
-    
-    // Mostrar credenciales de prueba en laz consola
-    console.log("=== CREDENCIALES DE PRUEBA ===");
-    console.log("Documento: 73605624");
-    console.log("Contraseña: 1234asdA@");
-    console.log("===========================");
-});
+// Exporta la función para uso global
+window.clearSession = clearSession;
+
+// Nota: Ya no se limpia la sesión automáticamente al cargar la página.
+// El llamado a clearSession() debe hacerse solo al cerrar sesión.
+// El código de credenciales de prueba ha sido removido para producción.

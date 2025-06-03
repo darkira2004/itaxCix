@@ -197,5 +197,11 @@
     <!-- 5. Utilidades de sesión -->
     <script src="../../assets/js/utils/session-cleaner.js"></script>
     <script src="../../assets/js/utils/auth-checker.js"></script>
+    <script>
+        // Verifica la autenticación al cargar la página usando authChecker
+        if (!window.authChecker.checkAuthentication()) {
+            // Si no está autenticado, la función ya redirige al login
+        }
+    </script>
 </body>
 </html>
