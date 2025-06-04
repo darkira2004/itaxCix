@@ -33,8 +33,10 @@ class RouteGuard {
         });
         // También para pageshow (cuando vuelve del caché)
         window.addEventListener("pageshow", (event) => {
-            if (event.persisted && !this.isAuthenticated()) {
-                this.redirectToLogin();
+            // Si la página viene del caché o la sesión no es válida, redirige
+            if (event.persisted || !this.isAuthenticated()) {
+                // Forzar recarga desde el servidor y redirigir
+                window.location.replace(this.loginPath);
             }
         });
     }
