@@ -40,9 +40,14 @@ class LoginController {
     }
 
     async handleLogin() {
-        // Usa el ID correcto del input
-        const documentValue = document.getElementById('documentValue').value;
-        const password = document.getElementById('password').value;
+        const documentInput = document.getElementById('documentValue');
+        const passwordInput = document.getElementById('password');
+        if (!documentInput || !passwordInput) {
+            this.showError("Error interno: formulario no disponible.");
+            return;
+        }
+        const documentValue = documentInput.value;
+        const password = passwordInput.value;
 
         try {
             this.setLoading(true);

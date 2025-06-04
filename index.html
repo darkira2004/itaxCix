@@ -49,11 +49,21 @@
     <p id="error-msg" style="color: red; display: none;">Usuario o contraseña incorrectos</p>
   </div>
 </div>
+
+<script>
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        // Fuerza recarga real desde el servidor
+        window.location.reload();
+    }
+});
+</script>
 <!-- Cargar el archivo JavaScript externo -->
 <script src="./assets/js/utils/session-cleaner.js"></script>
 <script src="./assets/js/api/services/mock-login-service.js"></script>
 <script src="./assets/js/ui/controllers/login-controller.js"></script>
 <script src="../../assets/js/utils/route-guard.js"></script>
+
 
 </body>
 </html>
