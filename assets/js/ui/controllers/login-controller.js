@@ -40,33 +40,32 @@ class LoginController {
     }
 
     async handleLogin() {
-        const documentValue = document.getElementById('username').value;
+        // Usa el ID correcto del input
+        const documentValue = document.getElementById('documentValue').value;
         const password = document.getElementById('password').value;
 
         try {
             this.setLoading(true);
             const response = await this.loginService.verifyCredentials(documentValue, password);
-            
-            if (response.success && response.data) {
-                // Limpiar cualquier sesión anterior
+
+            // Soporta tanto mock (objeto plano) como API real ({success, data})
+            const data = response && response.data ? response.data : response;
+
+            if (data && data.token) {
                 sessionStorage.clear();
-                
-                // Guardar datos de sesión
                 sessionStorage.setItem("isLoggedIn", "true");
-                sessionStorage.setItem("authToken", response.data.token);
-                sessionStorage.setItem("userId", response.data.userId.toString());
-                sessionStorage.setItem("documentValue", response.data.documentValue);
-                sessionStorage.setItem("userRoles", JSON.stringify(response.data.roles));
-                sessionStorage.setItem("userPermissions", JSON.stringify(response.data.permissions));
-                sessionStorage.setItem("userAvailability", response.data.availability?.toString() ?? "true");
+                sessionStorage.setItem("authToken", data.token);
+                sessionStorage.setItem("userId", data.userId.toString());
+                sessionStorage.setItem("documentValue", data.documentValue);
+                sessionStorage.setItem("userRoles", JSON.stringify(data.roles));
+                sessionStorage.setItem("userPermissions", JSON.stringify(data.permissions));
+                sessionStorage.setItem("userAvailability", data.availability?.toString() ?? "true");
                 sessionStorage.setItem("loginTime", Date.now().toString());
 
-                // Prevenir navegación hacia atrás antes de redirigir
                 window.history.pushState(null, '', window.location.href);
-                // Usar la ruta base correcta para la redirección
                 window.location.replace(`${this.baseUrl}/pages/usuarios/ControlAdmisionConductores.html`);
             } else {
-                this.showError(response.message || "Error de autenticación");
+                this.showError((response && response.message) || "Error de autenticación");
             }
         } catch (error) {
             console.error('Error durante el login:', error);

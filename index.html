@@ -37,12 +37,8 @@
  
     <!-- Formulario de login -->
     <form class="login-form" id="login-form">
-      <input type="text" id="username" placeholder="Número de documento" required>
-      <div class="password-container">
-        <input type="password" id="password" placeholder="Contraseña" required>
-        <i class="toggle-password fa-solid fa-eye-slash" id="togglePassword"></i>
-        <div class="contraseña-olvidada">¿olvidaste tu contraseña?</div>
-      </div>
+      <input id="documentValue" type="text" placeholder="Documento" />
+      <input id="password" type="password" placeholder="Contraseña" />
       <button class="btn-ingresar" type="submit">
     <span class="btn-text">Ingresar</span>
     <span class="btn-loading" style="display: none;">Verificando...</span>
@@ -53,10 +49,11 @@
     <p id="error-msg" style="color: red; display: none;">Usuario o contraseña incorrectos</p>
   </div>
 </div>
-
 <!-- Cargar el archivo JavaScript externo -->
 <script src="./assets/js/utils/session-cleaner.js"></script>
 <script src="./assets/js/api/services/mock-login-service.js"></script>
 <script src="./assets/js/ui/controllers/login-controller.js"></script>
+<script src="../../assets/js/utils/route-guard.js"></script>
+
 </body>
 </html>

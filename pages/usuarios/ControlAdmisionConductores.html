@@ -181,7 +181,12 @@
     <!-- Carga de scripts en orden específico para manejar dependencias -->
     <!-- 1. Utilidades y herramientas base -->
     <script src="../../assets/js/utils/auth-checker.js"></script>
-    
+    <script src="../../assets/js/utils/route-guard.js"></script>
+    <script>
+        // Inicializa RouteGuard para proteger la página
+        window.routeGuard = new RouteGuard("../../index.html");
+    </script>
+
     <!-- 2. Modelos de datos -->
     <script src="../../assets/js/api/models/conductor.js"></script>
     
@@ -191,7 +196,6 @@
     <!-- 4. Controladores de UI -->
     <script src="../../assets/js/ui/controllers/sidebar-controller.js"></script>
     <script src="../../assets/js/ui/controllers/ui-controller.js"></script>
-
     <script src="../../assets/js/ui/controllers/app-initializer.js"></script>
     
     <!-- 5. Utilidades de sesión -->

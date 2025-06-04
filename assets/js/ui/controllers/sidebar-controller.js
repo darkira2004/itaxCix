@@ -32,12 +32,9 @@ class SidebarController {
 
         // Evento para cerrar sesión
         if (this.logoutButton) {
-            this.logoutButton.addEventListener('click', (e) => {
+            this.logoutButton.addEventListener('click', function(e) {
                 e.preventDefault();
-                // Limpia el almacenamiento y redirige al login
-                localStorage.clear();
-                sessionStorage.clear();
-                window.location.href = '/index.html';
+                routeGuard.logout();
             });
         }
     }
