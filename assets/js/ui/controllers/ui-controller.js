@@ -19,7 +19,7 @@ class UIController {
         this.modalDni = document.getElementById('modal-dni');
         this.modalPlaca = document.getElementById('modal-placa');
         this.modalContacto = document.getElementById('modal-contacto');
-        this.modalEstadoTuc = document.getElementById('modal-estado-tuc');
+        this.modalEstadoTuc = document.getElementById('modal-estado');
         this.modalAvatar = document.getElementById('modal-avatar');
         // Eliminamos las referencias a modalAccept y modalReject
         this.sidebar = document.getElementById('sidebar');
