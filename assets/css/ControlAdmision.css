@@ -80,19 +80,19 @@ body {
     overflow: hidden;
 }
 
-/* Tabla de conductores - Corrección de alineación */
+/* Tabla de conductores */
 .drivers-table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed; /* Fuerza el ancho de columnas */
+    table-layout: fixed;
 }
 
 /* Definir anchos específicos para las columnas */
 .drivers-table th:nth-child(1) { width: 35%; } /* Nombre - más ancho */
 .drivers-table th:nth-child(2) { width: 15%; } /* DNI */
 .drivers-table th:nth-child(3) { width: 15%; } /* Placa */
-.drivers-table th:nth-child(4) { width: 25%; } /* Contacto */
-.drivers-table th:nth-child(5) { width: 10%; } /* Acciones */
+.drivers-table th:nth-child(4) { width: 20%; } /* Contacto */
+.drivers-table th:nth-child(5) { width: 15%; } /* Acciones */
 
 .drivers-table th {
     background-color: #e0e0e0;
@@ -107,7 +107,7 @@ body {
     border-bottom: 1px solid #eee;
     vertical-align: middle;
     height: 60px;
-    overflow: hidden; /* Evita desbordamiento */
+    overflow: hidden;
 }
 
 .driver-row {
@@ -118,7 +118,7 @@ body {
     background-color: #f8f8f8;
 }
 
-/* Columna de nombre con avatar - Corregida */
+/* Columna de nombre con avatar */
 .driver-name {
     display: flex;
     align-items: center;
@@ -159,26 +159,34 @@ body {
 /* Botones de acción */
 .actions {
     display: flex;
-    gap: 6px;
+    gap: 8px;
     justify-content: center;
     align-items: center;
     white-space: nowrap;
-    padding: 10px 15px;
+    padding: 5px;
 }
 
 .actions .btn {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     padding: 0;
     margin: 0;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.actions .btn i {
     font-size: 14px;
+    line-height: 1;
+    position: relative;
+    z-index: 1;
 }
 
 /* Botón Detalles */
@@ -190,7 +198,7 @@ body {
 .btn-details:hover {
     background-color: #5a6268;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
 }
 
 /* Botón Aprobar */
@@ -202,7 +210,7 @@ body {
 .btn-approve:hover {
     background-color: #218838;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
 }
 
 /* Botón Rechazar */
@@ -214,233 +222,10 @@ body {
 .btn-reject:hover {
     background-color: #c82333;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
 }
 
-/* Iconos en los botones */
-.actions .btn i {
-    font-size: 13px;
-}
-
-/* Reducir el ancho de la columna de acciones */
-.drivers-table th:nth-child(5) { 
-    width: 15%; /* Reducir ya que solo son iconos */
-}
-
-/* Responsive para botones de iconos */
-@media (max-width: 768px) {
-    .actions {
-        gap: 4px;
-    }
-    
-    .actions .btn {
-        width: 28px;
-        height: 28px;
-        font-size: 12px;
-    }
-    
-    .actions .btn i {
-        font-size: 11px;
-    }
-}
-
-@media (max-width: 480px) {
-    .actions {
-        gap: 3px;
-    }
-    
-    .actions .btn {
-        width: 24px;
-        height: 24px;
-        font-size: 11px;
-    }
-    
-    .actions .btn i {
-        font-size: 10px;
-    }
-}
-
-/* Estilos adicionales para la tabla de conductores */
-.drivers-table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed; /* Fuerza el ancho de columnas */
-}
-
-/* Definir anchos específicos para las columnas */
-.drivers-table th:nth-child(1) { width: 35%; } /* Nombre - más ancho */
-.drivers-table th:nth-child(2) { width: 15%; } /* DNI */
-.drivers-table th:nth-child(3) { width: 15%; } /* Placa */
-.drivers-table th:nth-child(4) { width: 25%; } /* Contacto */
-.drivers-table th:nth-child(5) { width: 10%; } /* Acciones */
-
-.drivers-table th {
-    background-color: #e0e0e0;
-    padding: 12px 15px;
-    text-align: left;
-    font-weight: bold;
-    vertical-align: middle;
-}
-
-.drivers-table td {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-    vertical-align: middle;
-    height: 60px;
-    overflow: hidden; /* Evita desbordamiento */
-}
-
-.driver-row {
-    background-color: #f0f0f0;
-}
-
-.driver-row:hover {
-    background-color: #f8f8f8;
-}
-
-/* Columna de nombre con avatar - Corregida */
-.driver-name {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    height: 100%;
-    min-height: 50px;
-    width: 100%; /* Asegurar que use todo el ancho disponible */
-}
-
-.avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    overflow: hidden;
-    background-color: #ddd;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.driver-name span {
-    flex: 1;
-    font-weight: 500;
-    color: #333;
-    line-height: 1.2; /* Reducir line-height para evitar saltos de línea */
-    white-space: nowrap; /* Evitar que el texto se divida en múltiples líneas */
-    overflow: hidden;
-    text-overflow: ellipsis; /* Mostrar "..." si el texto es muy largo */
-}
-
-/* Botones de acción */
-.actions {
-    display: flex;
-    gap: 6px;
-    justify-content: center;
-    align-items: center;
-    white-space: nowrap;
-    padding: 10px 15px;
-}
-
-.actions .btn {
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    margin: 0;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    font-size: 14px;
-}
-
-/* Botón Detalles */
-.btn-details {
-    background-color: #6c757d;
-    color: white;
-}
-
-.btn-details:hover {
-    background-color: #5a6268;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
-}
-
-/* Botón Aprobar */
-.btn-approve {
-    background-color: #28a745;
-    color: white;
-}
-
-.btn-approve:hover {
-    background-color: #218838;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
-}
-
-/* Botón Rechazar */
-.btn-reject {
-    background-color: #dc3545;
-    color: white;
-}
-
-.btn-reject:hover {
-    background-color: #c82333;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
-}
-
-/* Iconos en los botones */
-.actions .btn i {
-    font-size: 13px;
-}
-
-/* Reducir el ancho de la columna de acciones */
-.drivers-table th:nth-child(5) { 
-    width: 15%; /* Reducir ya que solo son iconos */
-}
-
-/* Responsive para botones de iconos */
-@media (max-width: 768px) {
-    .actions {
-        gap: 4px;
-    }
-    
-    .actions .btn {
-        width: 28px;
-        height: 28px;
-        font-size: 12px;
-    }
-    
-    .actions .btn i {
-        font-size: 11px;
-    }
-}
-
-@media (max-width: 480px) {
-    .actions {
-        gap: 3px;
-    }
-    
-    .actions .btn {
-        width: 24px;
-        height: 24px;
-        font-size: 11px;
-    }
-    
-    .actions .btn i {
-        font-size: 10px;
-    }
-}
-
-/* Modal de detalles - Versión elegante */
+/* Modal de detalles */
 .modal {
     display: none;
     position: fixed;
@@ -649,7 +434,7 @@ body {
     line-height: 1.4;
 }
 
-/* Botones de acción */
+/* Botones de acción del modal */
 .modal-actions {
     display: flex;
     justify-content: center;
@@ -660,18 +445,18 @@ body {
 }
 
 .modal-actions .btn {
-    padding: 10px 20px;
+    padding: 12px 24px;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     transition: all 0.2s ease;
-    min-width: 120px;
+    min-width: 140px;
     justify-content: center;
 }
 
@@ -682,6 +467,8 @@ body {
 
 .modal-actions .btn-accept:hover {
     background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
 }
 
 .modal-actions .btn-reject {
@@ -691,6 +478,8 @@ body {
 
 .modal-actions .btn-reject:hover {
     background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
 }
 
 /* Toast de notificación */
@@ -707,6 +496,19 @@ body {
     display: none;
     animation: fadeIn 0.3s, fadeOut 0.3s 2.7s;
     animation-fill-mode: forwards;
+}
+
+.toast.success {
+    background-color: #28a745;
+}
+
+.toast.error {
+    background-color: #dc3545;
+}
+
+.toast.warning {
+    background-color: #ffc107;
+    color: #212529;
 }
 
 @keyframes fadeIn {
@@ -734,15 +536,9 @@ body {
         margin: 0;
         border-radius: 0;
     }
-
-    .drivers-table {
-        min-width: 100%;
-        overflow-x: auto;
-    }
 }
 
 @media (max-width: 768px) {
-    /* Ajustar anchos en pantallas pequeñas */
     .drivers-table th:nth-child(1) { width: 40%; }
     .drivers-table th:nth-child(2) { width: 20%; }
     .drivers-table th:nth-child(3) { width: 15%; }
@@ -765,8 +561,12 @@ body {
     }
     
     .actions .btn {
-        padding: 6px 10px;
-        font-size: 0.9em;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .actions .btn i {
+        font-size: 12px;
     }
 }
 
@@ -788,5 +588,14 @@ body {
     
     .driver-name span {
         font-size: 13px;
+    }
+    
+    .actions .btn {
+        width: 26px;
+        height: 26px;
+    }
+    
+    .actions .btn i {
+        font-size: 11px;
     }
 }

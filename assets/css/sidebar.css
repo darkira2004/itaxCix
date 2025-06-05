@@ -100,20 +100,67 @@
 }
 
 /* Flecha para el submenú */
-.sidebar-menu .has-submenu > a .submenu-arrow {
-    display: inline-block;
-    margin-left: auto;
-    border: solid #ecf0f1;
-    border-width: 0 2.5px 2.5px 0;
-    padding: 4px;
-    transform: rotate(45deg);
-    transition: transform 0.2s;
-    margin-right: 4px;
-}
+
 
 /* Girar flecha cuando el submenú está abierto */
-.sidebar-menu .has-submenu.open > a .submenu-arrow {
-    transform: rotate(-135deg);
+
+
+/* Submenu styles */
+.sidebar-menu .has-submenu > a {
+    position: relative;
+}
+
+.submenu-arrow {
+    margin-left: auto;
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.submenu-arrow::before {
+    content: "▼";
+    font-family: Arial, sans-serif;
+}
+
+.has-submenu.open .submenu-arrow {
+    transform: rotate(180deg);
+}
+
+.submenu {
+    max-height: 0;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.2);
+    transition: max-height 0.3s ease;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.has-submenu.open .submenu {
+    max-height: 300px;
+    padding: 8px 0;
+}
+
+.submenu li {
+    margin: 0;
+}
+
+.submenu li a {
+    padding: 8px 20px 8px 50px;
+    margin: 2px 12px;
+    font-size: 14px;
+    background: transparent;
+}
+
+.submenu li a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: none;
+}
+
+.submenu li a i {
+    width: 16px;
+    height: 16px;
+    font-size: 14px;
+    margin-right: 10px;
 }
 
 /* Pie del sidebar */

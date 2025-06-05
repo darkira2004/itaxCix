@@ -8,6 +8,7 @@ class SidebarController {
 
     init() {
         this.setupEventListeners();
+        this.initializeSubmenu(); // AGREGAR ESTA LÍNEA
     }
 
     setupEventListeners() {
@@ -16,18 +17,6 @@ class SidebarController {
             this.closeButton.addEventListener('click', () => {
                 this.sidebar.classList.toggle('collapsed');
             });
-        }
-        // Manejador del submenu
-        const tablasLink = document.querySelector('.module-tablas');
-        if (tablasLink) {
-            tablasLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation(); // <-- Añade esto
-                const submenuParent = tablasLink.closest('.has-submenu');
-                if (submenuParent) {
-                    submenuParent.classList.toggle('open');
-                }
-            }, { once: false }); // Asegura que no se registre solo una vez
         }
 
         // Evento para cerrar sesión
@@ -38,11 +27,43 @@ class SidebarController {
             });
         }
     }
+
+    // AGREGAR ESTE MÉTODO COMPLETO
+    initializeSubmenu() {
+        // Manejar click en elementos con submenu
+        const submenuItems = document.querySelectorAll('.has-submenu > a');
+        
+        submenuItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const parentLi = item.parentElement;
+                const isOpen = parentLi.classList.contains('open');
+                
+                // Cerrar todos los otros submenus
+                document.querySelectorAll('.has-submenu.open').forEach(openItem => {
+                    if (openItem !== parentLi) {
+                        openItem.classList.remove('open');
+                    }
+                });
+                
+                // Toggle el submenu actual
+                if (isOpen) {
+                    parentLi.classList.remove('open');
+                } else {
+                    parentLi.classList.add('open');
+                }
+                
+                console.log('Submenu toggled:', isOpen ? 'closed' : 'opened');
+            });
+        });
+    }
 }
 
 // Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
-    if (!window.sidebarControllerInstance) { // Evita doble inicialización
+    if (!window.sidebarControllerInstance) {
         window.sidebarControllerInstance = new SidebarController();
     }
 });

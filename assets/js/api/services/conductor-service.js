@@ -1,7 +1,8 @@
 // Servicio para gestionar conductores (conectándose a endpoints)
 class ConductorService {
     constructor() {
-        this.apiUrl = 'https://149.130.161.148/api/v1'; // API real
+        this.apiUrl = 'https://149.130.161.148/api/v1'; // ← Sin barra final
+        console.log('API URL configurada:', this.apiUrl);
     }
 
     /**
@@ -97,37 +98,78 @@ class ConductorService {
      */
     async aprobarConductor(driverId) {
         try {
-            const url = `${this.apiUrl}/drivers/approve/`; // AGREGAR LA BARRA AL FINAL
+            const url = `${this.apiUrl}/drivers/approve`;
             const token = sessionStorage.getItem('authToken');
             
-            const response = await fetch(url, {
+            console.log('=== APROBAR CONDUCTOR - PROBANDO FORMATOS ===');
+            console.log('URL:', url);
+            console.log('DriverId original:', driverId);
+            
+            // FORMATO 1: Objeto con driverId (actual)
+            let requestBody = { driverId: parseInt(driverId) };
+            console.log('Formato 1 - Objeto:', JSON.stringify(requestBody));
+            
+            let response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     'Authorization': token ? 'Bearer ' + token : ''
                 },
-                body: JSON.stringify({
-                    driverId: driverId
-                })
+                body: JSON.stringify(requestBody)
             });
-
+            
+            let responseData = await response.json();
+            console.log('Respuesta formato 1:', response.status, responseData);
+            
+            // Si falla, probar FORMATO 2: Solo el ID
+            if (!response.ok && response.status === 400) {
+                console.log('Probando formato 2 - Solo ID como número...');
+                
+                response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': token ? 'Bearer ' + token : ''
+                    },
+                    body: JSON.stringify(parseInt(driverId)) // Solo el número
+                });
+                
+                responseData = await response.json();
+                console.log('Respuesta formato 2:', response.status, responseData);
+            }
+            
+            // Si falla, probar FORMATO 3: Objeto con "id"
+            if (!response.ok && response.status === 400) {
+                console.log('Probando formato 3 - Objeto con id...');
+                
+                requestBody = { id: parseInt(driverId) };
+                
+                response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': token ? 'Bearer ' + token : ''
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                responseData = await response.json();
+                console.log('Respuesta formato 3:', response.status, responseData);
+            }
+            
             if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Error al aprobar conductor:', errorText);
+                console.error('❌ Todos los formatos fallaron:', responseData);
                 throw new Error(`Error HTTP: ${response.status}`);
             }
-
-            const responseData = await response.json();
-            console.log('Respuesta aprobar conductor:', responseData);
             
-            if (responseData.success === false) {
-                throw new Error(responseData.message || 'Error al aprobar conductor');
-            }
-            
+            console.log('✅ Éxito con algún formato');
             return responseData;
+            
         } catch (error) {
-            console.error('Error al aprobar conductor:', error);
+            console.error('❌ Error:', error);
             throw error;
         }
     }
@@ -139,7 +181,7 @@ class ConductorService {
      */
     async rechazarConductor(driverId) {
         try {
-            const url = `${this.apiUrl}/drivers/reject/`;
+            const url = `${this.apiUrl}/drivers/reject`;
             const token = sessionStorage.getItem('authToken');
             
             console.log('URL para rechazar:', url);

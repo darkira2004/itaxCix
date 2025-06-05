@@ -8,9 +8,6 @@ class UIController {
         // Instancia del servicio de conductores que maneja la comunicación con la API real
         this.conductorService = new ConductorService();
 
-        // Variable para almacenar el ID del conductor que se está visualizando actualmente en el modal
-        this.currentConductorId = null;
-
         // Referencias a elementos del DOM
         this.driversList = document.getElementById('drivers-list');
         this.loadingIndicator = document.getElementById('loading-indicator');
@@ -22,10 +19,9 @@ class UIController {
         this.modalDni = document.getElementById('modal-dni');
         this.modalPlaca = document.getElementById('modal-placa');
         this.modalContacto = document.getElementById('modal-contacto');
-        this.modalEstado = document.getElementById('modal-estado');
+        this.modalEstadoTuc = document.getElementById('modal-estado-tuc');
         this.modalAvatar = document.getElementById('modal-avatar');
-        this.modalAccept = document.getElementById('modal-accept');
-        this.modalReject = document.getElementById('modal-reject');
+        // Eliminamos las referencias a modalAccept y modalReject
         this.sidebar = document.getElementById('sidebar');
         this.openSidebarBtn = document.getElementById('open-sidebar');
         this.closeSidebarBtn = document.getElementById('close-sidebar');
@@ -112,7 +108,7 @@ class UIController {
         this.driversList.appendChild(row);
     }
 
-    // Método para inicializar eventos - ACTUALIZADO con nuevos botones
+    // Método para inicializar eventos - LIMPIO
     initializeEvents() {
         // DELEGACIÓN DE EVENTOS para todos los botones de la tabla
         this.driversList.addEventListener('click', async (e) => {
@@ -122,7 +118,7 @@ class UIController {
             const driverId = parseInt(button.dataset.id);
             
             if (button.classList.contains('btn-details')) {
-                // BOTÓN DETALLES
+                // BOTÓN DETALLES - SOLO MOSTRAR INFORMACIÓN
                 try {
                     const conductorDetallado = await this.conductorService.obtenerConductorPendientePorId(driverId);
                     if (conductorDetallado) {
@@ -133,30 +129,13 @@ class UIController {
                     this.showToast('Error al cargar los detalles del conductor', 'error');
                 }
             } else if (button.classList.contains('btn-approve')) {
-                // BOTÓN APROBAR - DIRECTO DESDE LA TABLA
+                // BOTÓN APROBAR - SOLO DESDE LA TABLA
                 await this.aprobarConductor(driverId);
             } else if (button.classList.contains('btn-reject')) {
-                // BOTÓN RECHAZAR - DIRECTO DESDE LA TABLA
+                // BOTÓN RECHAZAR - SOLO DESDE LA TABLA
                 await this.rechazarConductor(driverId);
             }
         });
-
-        // BOTONES DEL MODAL (mantener para compatibilidad)
-        if (this.modalAccept) {
-            this.modalAccept.addEventListener('click', async () => {
-                if (this.currentConductorId) {
-                    await this.aprobarConductor(this.currentConductorId);
-                }
-            });
-        }
-
-        if (this.modalReject) {
-            this.modalReject.addEventListener('click', async () => {
-                if (this.currentConductorId) {
-                    await this.rechazarConductor(this.currentConductorId);
-                }
-            });
-        }
 
         // CERRAR MODAL
         if (this.closeModal) {
@@ -181,21 +160,22 @@ class UIController {
         }
     }
 
-    // Método para mostrar los detalles de un conductor en el modal
+    // Método para mostrar los detalles de un conductor en el modal - SOLO INFORMACIÓN
     showDriverDetails(conductor) {
         // Si recibe datos planos, convertir a clase
         if (!(conductor instanceof Conductor)) {
             conductor = Conductor.fromApiData(conductor);
         }
         
-        this.currentConductorId = conductor.driverId;
+        // Ya no necesitamos currentConductorId
+        // this.currentConductorId = conductor.driverId;
         
         // Usar métodos de la clase
         this.modalName.textContent = conductor.getNombreCompleto();
         this.modalDni.textContent = conductor.documentValue || 'No disponible';
         this.modalPlaca.textContent = conductor.plateValue || 'No disponible';
         this.modalContacto.textContent = conductor.contactValue || 'No disponible';
-        this.modalEstado.textContent = conductor.tucStatus || 'PENDIENTE';
+        this.modalEstadoTuc.textContent = conductor.tucStatus || 'PENDIENTE';
         
         // Nuevos campos con métodos de la clase
         document.getElementById('modal-ruc').textContent = conductor.rucCompany || 'No disponible';
