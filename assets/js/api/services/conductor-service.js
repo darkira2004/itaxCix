@@ -1,133 +1,179 @@
 // Servicio para gestionar conductores (conectándose a endpoints)
 class ConductorService {
     constructor() {
-        this.conductores = []; // Inicializamos con un array vacío
-        this.apiUrl = 'https://randomuser.me/api/'; // API pública de usuarios aleatorios
+        this.apiUrl = 'https://149.130.161.148/api/v1'; // API real
     }
 
-    // Método para cargar conductores desde la API
-    async cargarConductoresDesdeAPI() {
+    /**
+     * Obtiene los detalles de un conductor pendiente por su ID desde la API real.
+     * @param {number} id - ID del conductor pendiente
+     * @returns {Promise<Object>} - Detalles del conductor
+     */
+    async obtenerConductorPendientePorId(id) {
         try {
-            console.log("Cargando conductores desde API...");
-            
-            // Hacer petición a la API de Random User para obtener 10 usuarios
-            const response = await fetch(`${this.apiUrl}?results=10&nat=es`);
-            
+            const url = `${this.apiUrl}/drivers/pending/${id}`;
+            const token = sessionStorage.getItem('authToken');
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': token ? 'Bearer ' + token : ''
+                }
+            });
+
             if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Respuesta de error:', errorText);
                 throw new Error(`Error HTTP: ${response.status}`);
             }
+
+            const responseData = await response.json();
+            console.log('Respuesta detalle conductor:', responseData); // Para depuración
             
-            const data = await response.json();
-            console.log("Datos recibidos de la API:", data);
+            if (responseData.success === false) {
+                throw new Error(responseData.message || 'Error al obtener conductor');
+            }
             
-            // Convertir cada objeto de datos en una instancia de Conductor
-            this.conductores = data.results.map((user, index) => {
-                // Generar una placa aleatoria
-                const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                const placa = Array(5).fill().map(() => letras.charAt(Math.floor(Math.random() * letras.length))).join('');
-                
-                return new Conductor(
-                    index + 1, // ID
-                    user.name.first, // Nombre
-                    user.name.last, // Apellido
-                    user.id.value || `${Math.floor(Math.random() * 10000000)}`, // DNI (o número aleatorio si no hay)
-                    placa, // Placa aleatoria
-                    user.phone, // Teléfono como contacto
-                    user.picture.medium, // Imagen
-                    'pendiente' // Estado por defecto
-                );
-            });
+            // Extraer los datos del conductor del objeto data
+            if (responseData.data) {
+                return responseData.data;
+            }
             
-            console.log("Conductores cargados:", this.conductores);
-            return this.conductores;
+            return null;
         } catch (error) {
-            console.error('Error al cargar conductores:', error);
+            console.error('Error al obtener detalles del conductor:', error);
             throw error;
         }
     }
 
-    // Método para obtener todos los conductores
-    obtenerTodos() {
-        return this.conductores;
-    }
-
-    // Método para obtener conductores por estado
-    obtenerPorEstado(estado) {
-        return this.conductores.filter(conductor => conductor.estado === estado);
-    }
-
-    // Método para obtener un conductor por ID
-    obtenerPorId(id) {
-        return this.conductores.find(conductor => conductor.id === id);
-    }
-
-    // Método para aprobar un conductor (actualiza en la API)
-    async aprobarConductor(id) {
+    /**
+     * Obtiene la lista de todos los conductores pendientes desde la API real con paginación.
+     * @param {number} page - Número de página (empezando en 0)
+     * @param {number} perPage - Cantidad de elementos por página
+     * @returns {Promise<Array>} - Array de conductores pendientes
+     */
+    async obtenerConductoresPendientes(page = 0, perPage = 10) {
         try {
-            const conductor = this.obtenerPorId(id);
-            if (!conductor) {
-                throw new Error('Conductor no encontrado');
+            const url = `${this.apiUrl}/drivers/pending?page=${page}&perPage=${perPage}`;
+            const token = sessionStorage.getItem('authToken');
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': token ? 'Bearer ' + token : ''
+                }
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Respuesta de error:', errorText);
+                throw new Error(`Error HTTP: ${response.status}`);
             }
 
-            // Simulamos una petición a la API
-            await new Promise(resolve => setTimeout(resolve, 500));
+            const responseData = await response.json();
+            console.log('Respuesta de la API conductores:', responseData); // Para depuración
             
-            // Actualizar el estado localmente
-            return conductor.cambiarEstado('aprobado');
+            // Verificar si la respuesta es exitosa
+            if (responseData.success === false) {
+                throw new Error(responseData.message || 'No se encontraron conductores pendientes');
+            }
+            
+            // Extraer el array de conductores del objeto data.items
+            if (responseData.data && responseData.data.items && Array.isArray(responseData.data.items)) {
+                return responseData.data.items;
+            }
+            
+            return [];
+        } catch (error) {
+            console.error('Error al obtener conductores pendientes:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Aprueba un conductor pendiente por su ID.
+     * @param {number} driverId - ID del conductor a aprobar
+     * @returns {Promise<Object>} - Respuesta de la API
+     */
+    async aprobarConductor(driverId) {
+        try {
+            const url = `${this.apiUrl}/drivers/approve/`; // AGREGAR LA BARRA AL FINAL
+            const token = sessionStorage.getItem('authToken');
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': token ? 'Bearer ' + token : ''
+                },
+                body: JSON.stringify({
+                    driverId: driverId
+                })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Error al aprobar conductor:', errorText);
+                throw new Error(`Error HTTP: ${response.status}`);
+            }
+
+            const responseData = await response.json();
+            console.log('Respuesta aprobar conductor:', responseData);
+            
+            if (responseData.success === false) {
+                throw new Error(responseData.message || 'Error al aprobar conductor');
+            }
+            
+            return responseData;
         } catch (error) {
             console.error('Error al aprobar conductor:', error);
             throw error;
         }
     }
 
-    // Método para rechazar un conductor (actualiza en la API)
-    async rechazarConductor(id) {
+    /**
+     * Rechaza un conductor pendiente por su ID.
+     * @param {number} driverId - ID del conductor a rechazar
+     * @returns {Promise<Object>} - Respuesta de la API
+     */
+    async rechazarConductor(driverId) {
         try {
-            const conductor = this.obtenerPorId(id);
-            if (!conductor) {
-                throw new Error('Conductor no encontrado');
+            const url = `${this.apiUrl}/drivers/reject/`;
+            const token = sessionStorage.getItem('authToken');
+            
+            console.log('URL para rechazar:', url);
+            console.log('Driver ID:', driverId);
+            console.log('Token:', token ? 'Presente' : 'No presente');
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': token ? 'Bearer ' + token : ''
+                },
+                body: JSON.stringify(driverId.toString())
+            });
+
+            console.log('Status de respuesta:', response.status);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Error al rechazar conductor:', errorText);
+                throw new Error(`Error HTTP: ${response.status} - ${errorText}`);
             }
 
-            // Simulamos una petición a la API
-            await new Promise(resolve => setTimeout(resolve, 500));
+            const responseData = await response.json();
+            console.log('Respuesta rechazar conductor:', responseData);
             
-            // Actualizar el estado localmente
-            return conductor.cambiarEstado('rechazado');
+            if (responseData.success === false) {
+                throw new Error(responseData.message || 'Error al rechazar conductor');
+            }
+            
+            return responseData;
         } catch (error) {
             console.error('Error al rechazar conductor:', error);
-            throw error;
-        }
-    }
-
-    // Método para agregar un nuevo conductor
-    async agregarConductor(nombre, apellido, dni, placa, contacto, imagen) {
-        try {
-            // Simulamos una petición a la API
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            // Crear un nuevo ID (el siguiente disponible)
-            const id = this.conductores.length > 0 
-                ? Math.max(...this.conductores.map(c => c.id)) + 1 
-                : 1;
-            
-            // Crear una instancia de Conductor
-            const nuevoConductor = new Conductor(
-                id,
-                nombre,
-                apellido,
-                dni,
-                placa,
-                contacto,
-                imagen || 'https://via.placeholder.com/100',
-                'pendiente'
-            );
-            
-            // Añadir al array local
-            this.conductores.push(nuevoConductor);
-            
-            return nuevoConductor;
-        } catch (error) {
-            console.error('Error al agregar conductor:', error);
             throw error;
         }
     }

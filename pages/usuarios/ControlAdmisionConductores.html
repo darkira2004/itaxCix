@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="../../assets/css/sidebar.css">
     <link rel="stylesheet" href="../../assets/css/ControlAdmision.css">
     <!-- Font Awesome para iconografía -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <!-- Contenedor principal del layout -->
@@ -116,7 +116,7 @@
                                 <th>DNI</th>
                                 <th>Placa</th>
                                 <th>Contacto</th>
-                                <th></th>
+                                <th>Acciones</th> <!-- Cambiar de vacío a "Acciones" -->
                             </tr>
                         </thead>
                         <tbody id="drivers-list">
@@ -139,9 +139,11 @@
                 <!-- Perfil del conductor -->
                 <div class="driver-profile">
                     <div class="avatar-large">
-                        <img id="modal-avatar" src="https://via.placeholder.com/100" alt="Foto de perfil">
+                        <img id="modal-avatar" src="" alt="Foto de perfil">
                     </div>
-                    <h3 id="modal-name">Nombre del Conductor</h3>
+                    <div class="driver-profile-info">
+                        <h3 id="modal-name">Nombre del Conductor</h3>
+                    </div>
                 </div>
                 
                 <!-- Información detallada del conductor -->
@@ -159,8 +161,30 @@
                         <span id="modal-contacto">987654321</span>
                     </div>
                     <div class="info-item">
-                        <label>Estado:</label>
+                        <label>Estado TUC:</label>
                         <span id="modal-estado">Pendiente</span>
+                    </div>
+                    
+                    <!-- Nuevos campos agregados -->
+                    <div class="info-item">
+                        <label>RUC Empresa:</label>
+                        <span id="modal-ruc">No disponible</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Fecha Emisión TUC:</label>
+                        <span id="modal-tuc-issue">No disponible</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Fecha Vencimiento TUC:</label>
+                        <span id="modal-tuc-expiration">No disponible</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Modalidad TUC:</label>
+                        <span id="modal-tuc-modality">No disponible</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Tipo TUC:</label>
+                        <span id="modal-tuc-type">No disponible</span>
                     </div>
                 </div>
                 

@@ -40,6 +40,9 @@ class LoginService {
         return null
       }
       
+      // Guardar el token en sessionStorage
+      sessionStorage.setItem("authToken", baseResponse.data.token);
+
       // Devolver los datos de autenticación (AuthLoginResponseDTO)
       return baseResponse.data
     } catch (error) {
@@ -73,5 +76,5 @@ if (typeof module !== "undefined" && module.exports) {
   module.exports = LoginService
 } else {
   // Para navegadores sin soporte de módulos
-  window.LoginService = LoginService
+  window.LoginService = new LoginService();
 }
