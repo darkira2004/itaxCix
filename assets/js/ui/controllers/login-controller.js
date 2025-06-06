@@ -21,9 +21,7 @@ class LoginController {
             ? '/itaxCix'
             : '';
         this.init();
-    }
-
-    init() {
+    }    init() {
         // Prevenir comportamiento por defecto del formulario
         this.form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -31,20 +29,37 @@ class LoginController {
         });
 
         // Configurar toggle de contraseña
-        const togglePassword = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('password');
-        
-        if (togglePassword && passwordInput) {
-            togglePassword.addEventListener('click', () => {
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-                togglePassword.classList.toggle('fa-eye');
-                togglePassword.classList.toggle('fa-eye-slash');
-            });
-        }
+        this.setupPasswordToggle();
 
         // Configurar funcionalidad de recuperar contraseña
         this.setupPasswordRecovery();
+    }    /**
+     * Configura la funcionalidad para mostrar/ocultar contraseña
+     */
+    setupPasswordToggle() {
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eye-icon');
+        
+        if (passwordInput && eyeIcon) {
+            eyeIcon.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevenir cualquier comportamiento por defecto
+                
+                const isPassword = passwordInput.getAttribute('type') === 'password';
+                
+                // Toggle tipo de input
+                passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+                
+                // Toggle icono
+                eyeIcon.classList.toggle('fa-eye', !isPassword);
+                eyeIcon.classList.toggle('fa-eye-slash', isPassword);
+                
+                // Cambiar título del ícono para accesibilidad
+                eyeIcon.setAttribute('title', isPassword ? 'Ocultar contraseña' : 'Mostrar contraseña');
+            });
+            
+            // Establecer título inicial
+            eyeIcon.setAttribute('title', 'Mostrar contraseña');
+        }
     }
 
     setupPasswordRecovery() {
