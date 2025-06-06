@@ -97,128 +97,72 @@ class ConductorService {
      * @returns {Promise<Object>} - Respuesta de la API
      */
     async aprobarConductor(driverId) {
-        try {
-            const url = `${this.apiUrl}/drivers/approve`;
-            const token = sessionStorage.getItem('authToken');
-            
-            console.log('=== APROBAR CONDUCTOR - PROBANDO FORMATOS ===');
-            console.log('URL:', url);
-            console.log('DriverId original:', driverId);
-            
-            // FORMATO 1: Objeto con driverId (actual)
-            let requestBody = { driverId: parseInt(driverId) };
-            console.log('Formato 1 - Objeto:', JSON.stringify(requestBody));
-            
-            let response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': token ? 'Bearer ' + token : ''
-                },
-                body: JSON.stringify(requestBody)
-            });
-            
-            let responseData = await response.json();
-            console.log('Respuesta formato 1:', response.status, responseData);
-            
-            // Si falla, probar FORMATO 2: Solo el ID
-            if (!response.ok && response.status === 400) {
-                console.log('Probando formato 2 - Solo ID como número...');
-                
-                response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Authorization': token ? 'Bearer ' + token : ''
-                    },
-                    body: JSON.stringify(parseInt(driverId)) // Solo el número
-                });
-                
-                responseData = await response.json();
-                console.log('Respuesta formato 2:', response.status, responseData);
-            }
-            
-            // Si falla, probar FORMATO 3: Objeto con "id"
-            if (!response.ok && response.status === 400) {
-                console.log('Probando formato 3 - Objeto con id...');
-                
-                requestBody = { id: parseInt(driverId) };
-                
-                response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Authorization': token ? 'Bearer ' + token : ''
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-                
-                responseData = await response.json();
-                console.log('Respuesta formato 3:', response.status, responseData);
-            }
-            
-            if (!response.ok) {
-                console.error('❌ Todos los formatos fallaron:', responseData);
-                throw new Error(`Error HTTP: ${response.status}`);
-            }
-            
-            console.log('✅ Éxito con algún formato');
-            return responseData;
-            
-        } catch (error) {
-            console.error('❌ Error:', error);
-            throw error;
+    try {
+        const url = `${this.apiUrl}/drivers/approve`;
+        const token = sessionStorage.getItem('authToken');
+
+        const requestBody = { driverId: parseInt(driverId) };
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': token ? 'Bearer ' + token : ''
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        const responseData = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status} - ${responseData.message || 'Error desconocido'}`);
         }
+
+        return responseData;
+    } catch (error) {
+        console.error('❌ Error al aprobar conductor:', error);
+        throw error;
     }
+}
+
+
 
     /**
      * Rechaza un conductor pendiente por su ID.
      * @param {number} driverId - ID del conductor a rechazar
      * @returns {Promise<Object>} - Respuesta de la API
      */
-    async rechazarConductor(driverId) {
-        try {
-            const url = `${this.apiUrl}/drivers/reject`;
-            const token = sessionStorage.getItem('authToken');
-            
-            console.log('URL para rechazar:', url);
-            console.log('Driver ID:', driverId);
-            console.log('Token:', token ? 'Presente' : 'No presente');
-            
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': token ? 'Bearer ' + token : ''
-                },
-                body: JSON.stringify(driverId.toString())
-            });
+   async rechazarConductor(driverId) {
+    try {
+        const url = `${this.apiUrl}/drivers/reject`;
+        const token = sessionStorage.getItem('authToken');
 
-            console.log('Status de respuesta:', response.status);
-            
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Error al rechazar conductor:', errorText);
-                throw new Error(`Error HTTP: ${response.status} - ${errorText}`);
-            }
+        const requestBody = { driverId: parseInt(driverId) };
 
-            const responseData = await response.json();
-            console.log('Respuesta rechazar conductor:', responseData);
-            
-            if (responseData.success === false) {
-                throw new Error(responseData.message || 'Error al rechazar conductor');
-            }
-            
-            return responseData;
-        } catch (error) {
-            console.error('Error al rechazar conductor:', error);
-            throw error;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': token ? 'Bearer ' + token : ''
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        const responseData = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status} - ${responseData.message || 'Error desconocido'}`);
         }
+
+        return responseData;
+    } catch (error) {
+        console.error('❌ Error al rechazar conductor:', error);
+        throw error;
     }
+  }
+
 }
 
 // Exportar la clase para que esté disponible en otros archivos
