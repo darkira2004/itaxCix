@@ -64,6 +64,14 @@
       <span class="close-btn" id="close-modal">&times;</span>
     </div>    <div class="modal-body">
       <p>Selecciona cómo quieres recibir el código de recuperación:</p>
+        <!-- Mensaje informativo sobre disponibilidad de servicios -->
+      <div class="service-info">
+        <small class="info-text">
+          <i class="fas fa-info-circle"></i>
+          Revisa tu bandeja de entrada y spam. El código puede tardar unos minutos en llegar.
+        </small>
+      </div>
+      
       <form id="forgot-password-form">
         <!-- Selector de tipo de contacto -->
         <div class="contact-type-selector">
@@ -135,8 +143,65 @@
           <span class="btn-loading" style="display: none;">Verificando...</span>
         </button>
       </form>
+        <p id="verification-message" style="display: none;"></p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para cambiar contraseña -->
+<div id="change-password-modal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="change-password-header">
+      <button class="back-btn" id="back-to-verification" title="Volver">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h3>Nueva Contraseña</h3>
+    </div>
+    
+    <div class="change-password-body">
+      <p>Ingresa tu nueva contraseña para completar la recuperación:</p>
       
-      <p id="verification-message" style="display: none;"></p>
+      <form id="change-password-form">
+        <div class="password-input-container">
+          <input 
+            id="new-password" 
+            type="password" 
+            placeholder="Nueva contraseña" 
+            required
+            minlength="8"
+          />
+          <i class="fas fa-eye" id="new-password-eye"></i>
+        </div>
+        
+        <div class="password-input-container">
+          <input 
+            id="repeat-password" 
+            type="password" 
+            placeholder="Repetir contraseña" 
+            required
+            minlength="8"
+          />
+          <i class="fas fa-eye" id="repeat-password-eye"></i>
+        </div>
+        
+        <div class="password-requirements">
+          <p>La contraseña debe tener:</p>
+          <ul>
+            <li id="length-req">Mínimo 8 caracteres</li>
+            <li id="uppercase-req">Al menos una letra mayúscula</li>
+            <li id="lowercase-req">Al menos una letra minúscula</li>
+            <li id="number-req">Al menos un número</li>
+            <li id="special-req">Al menos un carácter especial (@$!%*?&)</li>
+          </ul>
+        </div>
+        
+        <button type="submit" class="btn-change-password">
+          <span class="btn-text">Cambiar contraseña</span>
+          <span class="btn-loading" style="display: none;">Cambiando...</span>
+        </button>
+      </form>
+      
+      <p id="change-password-message" style="display: none;"></p>
     </div>
   </div>
 </div>

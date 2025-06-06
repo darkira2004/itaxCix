@@ -23,8 +23,7 @@ class PasswordRecoveryController {
         
         // Elementos del selector de tipo de contacto
         this.contactTypeRadios = document.querySelectorAll('input[name="contactType"]');
-        
-        // Elementos para verificación de código
+          // Elementos para verificación de código
         this.verifyCodeModal = document.getElementById('verify-code-modal');
         this.backToRecoveryBtn = document.getElementById('back-to-recovery');
         this.verifyCodeForm = document.getElementById('verify-code-form');
@@ -34,23 +33,34 @@ class PasswordRecoveryController {
         this.resendTimer = document.getElementById('resend-timer');
         this.verificationMessage = document.getElementById('verification-message');
         
-        // Variables para el flujo de verificación
+        // Elementos para cambio de contraseña
+        this.changePasswordModal = document.getElementById('change-password-modal');
+        this.backToVerificationBtn = document.getElementById('back-to-verification');
+        this.changePasswordForm = document.getElementById('change-password-form');
+        this.newPasswordInput = document.getElementById('new-password');
+        this.repeatPasswordInput = document.getElementById('repeat-password');
+        this.newPasswordEye = document.getElementById('new-password-eye');
+        this.repeatPasswordEye = document.getElementById('repeat-password-eye');
+        this.changePasswordMessage = document.getElementById('change-password-message');
+          // Variables para el flujo de verificación
         this.currentUserId = null;
         this.currentContactValue = null;
         this.currentContactType = null;
+        this.currentToken = null;
         this.resendTimeout = null;
         this.resendCountdown = 60; // 60 segundos
         
         this.init();
-    }
-
-    init() {
+    }    init() {
         // Configurar funcionalidad de recuperar contraseña
         this.setupPasswordRecovery();
         
         // Configurar funcionalidad de verificación de código
         this.setupCodeVerification();
-    }    setupPasswordRecovery() {
+        
+        // Configurar funcionalidad de cambio de contraseña
+        this.setupChangePassword();
+    }setupPasswordRecovery() {
         console.log('Configurando eventos de recuperación de contraseña...');
         
         // Abrir modal al hacer clic en "¿Olvidaste tu contraseña?"
@@ -283,19 +293,14 @@ class PasswordRecoveryController {
             this.setVerificationLoading(true);
             this.clearVerificationMessage();
 
-            const result = await this.recoveryService.verifyRecoveryCode(this.currentUserId, code);
-
-            if (result.success) {
+            const result = await this.recoveryService.verifyRecoveryCode(this.currentUserId, code);            if (result.success) {
                 this.showVerificationMessage('¡Código verificado correctamente!', 'success');
                 
-                // Aquí podrías redirigir al siguiente paso (cambiar contraseña)
-                // Por ahora, cerrar modal después de 2 segundos
+                // Cerrar modal de verificación y abrir modal de cambio de contraseña
                 setTimeout(() => {
                     this.closeVerifyCodeModal();
-                    this.resetRecoveryFlow();
-                    // TODO: Implementar siguiente paso para cambiar contraseña
-                    alert(`Token recibido: ${result.token}\nSiguiente paso: cambiar contraseña`);
-                }, 2000);
+                    this.openChangePasswordModal(result.token);
+                }, 1500);
             } else {
                 this.showVerificationMessage(result.message, 'error');
             }
@@ -309,30 +314,43 @@ class PasswordRecoveryController {
     }
 
     async handleResendCode() {
-        if (!this.currentContactValue || !this.currentContactType) {
-            this.showVerificationMessage('Error interno. Vuelve a solicitar la recuperación.', 'error');
-            return;
-        }
-
         try {
+            console.log('Solicitando reenvío de código...');
+              // Verificar que tenemos los datos necesarios
+            if (!this.currentUserId || !this.currentContactValue || !this.currentContactType) {
+                this.showVerificationMessage('Error: No se pudieron recuperar los datos del usuario. Reinicia el proceso.', 'error');
+                return;
+            }
+            
+            // Mostrar estado de carga
             this.resendCodeBtn.disabled = true;
-            this.clearVerificationMessage();
-
-            const result = await this.recoveryService.requestPasswordReset(this.currentContactValue, this.currentContactType);
-
+            this.resendCodeBtn.textContent = 'Reenviando...';
+            
+            // Usar el método específico para reenvío con todos los parámetros necesarios
+            const result = await this.recoveryService.resendVerificationCode(this.currentUserId, this.currentContactValue, this.currentContactType);
+            
             if (result.success) {
-                this.currentUserId = result.userId;
-                this.showVerificationMessage('Código reenviado exitosamente.', 'success');
+                this.showVerificationMessage('Código reenviado exitosamente. Revisa tu bandeja de entrada.', 'success');
+                // Reiniciar el contador
                 this.startResendCountdown();
             } else {
                 this.showVerificationMessage(result.message, 'error');
-                this.resendCodeBtn.disabled = false;
+                // Rehabilitar el botón después de 3 segundos en caso de error
+                setTimeout(() => {
+                    this.resendCodeBtn.disabled = false;
+                    this.resendCodeBtn.textContent = 'Reenviar código';
+                }, 3000);
             }
-
+            
         } catch (error) {
             console.error('Error al reenviar código:', error);
-            this.showVerificationMessage('Error al reenviar código. Inténtalo más tarde.', 'error');
-            this.resendCodeBtn.disabled = false;
+            this.showVerificationMessage('Error inesperado al reenviar código. Inténtalo de nuevo.', 'error');
+            
+            // Rehabilitar el botón después de 3 segundos
+            setTimeout(() => {
+                this.resendCodeBtn.disabled = false;
+                this.resendCodeBtn.textContent = 'Reenviar código';
+            }, 3000);
         }
     }
 
@@ -415,10 +433,240 @@ class PasswordRecoveryController {
         }
     }
 
-    resetRecoveryFlow() {
+    setupChangePassword() {
+        // Botón para volver al modal de verificación
+        if (this.backToVerificationBtn) {
+            this.backToVerificationBtn.addEventListener('click', () => {
+                this.closeChangePasswordModal();
+                this.openVerifyCodeModal(this.currentContactValue, this.currentContactType, this.currentUserId);
+            });
+        }
+
+        // Cerrar modal al hacer clic fuera de él
+        if (this.changePasswordModal) {
+            this.changePasswordModal.addEventListener('click', (e) => {
+                if (e.target === this.changePasswordModal) {
+                    this.closeChangePasswordModal();
+                }
+            });
+        }
+
+        // Manejar envío del formulario de cambio de contraseña
+        if (this.changePasswordForm) {
+            this.changePasswordForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await this.handleChangePassword();
+            });
+        }
+
+        // Mostrar/ocultar contraseña nueva
+        if (this.newPasswordEye) {
+            this.newPasswordEye.addEventListener('click', () => {
+                this.togglePasswordVisibility(this.newPasswordInput, this.newPasswordEye);
+            });
+        }
+
+        // Mostrar/ocultar repetir contraseña
+        if (this.repeatPasswordEye) {
+            this.repeatPasswordEye.addEventListener('click', () => {
+                this.togglePasswordVisibility(this.repeatPasswordInput, this.repeatPasswordEye);
+            });
+        }
+
+        // Validación en tiempo real de la contraseña
+        if (this.newPasswordInput) {
+            this.newPasswordInput.addEventListener('input', () => {
+                this.validatePasswordRequirements();
+            });
+        }
+
+        if (this.repeatPasswordInput) {
+            this.repeatPasswordInput.addEventListener('input', () => {
+                this.validatePasswordMatch();
+            });
+        }
+    }
+
+    openChangePasswordModal(token) {
+        this.currentToken = token;
+        
+        // Limpiar campos
+        if (this.newPasswordInput) this.newPasswordInput.value = '';
+        if (this.repeatPasswordInput) this.repeatPasswordInput.value = '';
+        this.clearChangePasswordMessage();
+        this.resetPasswordRequirements();
+
+        // Mostrar modal
+        if (this.changePasswordModal) {
+            this.changePasswordModal.style.display = 'flex';
+            this.newPasswordInput.focus();
+        }
+    }
+
+    closeChangePasswordModal() {
+        if (this.changePasswordModal) {
+            this.changePasswordModal.style.display = 'none';
+        }
+    }
+
+    async handleChangePassword() {
+        const newPassword = this.newPasswordInput.value;
+        const repeatPassword = this.repeatPasswordInput.value;
+
+        // Validar campos vacíos
+        if (!newPassword || !repeatPassword) {
+            this.showChangePasswordMessage('Por favor, completa ambos campos de contraseña.', 'error');
+            return;
+        }
+
+        // Validar que las contraseñas coincidan
+        if (newPassword !== repeatPassword) {
+            this.showChangePasswordMessage('Las contraseñas no coinciden.', 'error');
+            return;
+        }
+
+        // Validar fortaleza de la contraseña
+        const validation = this.recoveryService.validatePasswordStrength(newPassword);
+        if (!validation.isValid) {
+            this.showChangePasswordMessage('La contraseña no cumple con todos los requisitos de seguridad.', 'error');
+            return;
+        }        if (!this.currentUserId) {
+            this.showChangePasswordMessage('Error interno. Vuelve a solicitar la recuperación.', 'error');
+            return;
+        }
+
+        if (!this.currentToken) {
+            this.showChangePasswordMessage('Error interno. Token de autorización no encontrado.', 'error');
+            return;
+        }
+
+        try {
+            this.setChangePasswordLoading(true);
+            this.clearChangePasswordMessage();
+
+            const result = await this.recoveryService.changePassword(this.currentUserId, newPassword, repeatPassword, this.currentToken);
+
+            if (result.success) {
+                this.showChangePasswordMessage('¡Contraseña cambiada exitosamente!', 'success');
+                
+                // Cerrar modal y resetear flujo después de 2 segundos
+                setTimeout(() => {
+                    this.closeChangePasswordModal();
+                    this.resetRecoveryFlow();
+                    
+                    // Opcional: mostrar mensaje de éxito en la página principal
+                    alert('Contraseña cambiada exitosamente. Ya puedes iniciar sesión con tu nueva contraseña.');
+                }, 2000);
+            } else {
+                this.showChangePasswordMessage(result.message, 'error');
+            }
+
+        } catch (error) {
+            console.error('Error al cambiar contraseña:', error);
+            this.showChangePasswordMessage('Error interno. Inténtalo más tarde.', 'error');
+        } finally {
+            this.setChangePasswordLoading(false);
+        }
+    }
+
+    togglePasswordVisibility(input, eyeIcon) {
+        if (input.type === 'password') {
+            input.type = 'text';
+            eyeIcon.classList.remove('fa-eye');
+            eyeIcon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            eyeIcon.classList.remove('fa-eye-slash');
+            eyeIcon.classList.add('fa-eye');
+        }
+    }
+
+    validatePasswordRequirements() {
+        const password = this.newPasswordInput.value;
+        const validation = this.recoveryService.validatePasswordStrength(password);
+        
+        // Actualizar indicadores visuales
+        const requirements = {
+            'length-req': validation.requirements.length,
+            'uppercase-req': validation.requirements.uppercase,
+            'lowercase-req': validation.requirements.lowercase,
+            'number-req': validation.requirements.number,
+            'special-req': validation.requirements.special
+        };
+
+        Object.entries(requirements).forEach(([id, isValid]) => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.classList.toggle('valid', isValid);
+                element.classList.toggle('invalid', !isValid);
+            }
+        });
+    }
+
+    validatePasswordMatch() {
+        const newPassword = this.newPasswordInput.value;
+        const repeatPassword = this.repeatPasswordInput.value;
+        
+        if (repeatPassword.length > 0) {
+            if (newPassword === repeatPassword) {
+                this.repeatPasswordInput.classList.remove('error');
+                this.repeatPasswordInput.classList.add('success');
+            } else {
+                this.repeatPasswordInput.classList.remove('success');
+                this.repeatPasswordInput.classList.add('error');
+            }
+        } else {
+            this.repeatPasswordInput.classList.remove('success', 'error');
+        }
+    }
+
+    resetPasswordRequirements() {
+        const requirementIds = ['length-req', 'uppercase-req', 'lowercase-req', 'number-req', 'special-req'];
+        requirementIds.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.classList.remove('valid', 'invalid');
+            }
+        });
+
+        if (this.newPasswordInput) {
+            this.newPasswordInput.classList.remove('success', 'error');
+        }
+        if (this.repeatPasswordInput) {
+            this.repeatPasswordInput.classList.remove('success', 'error');
+        }
+    }
+
+    setChangePasswordLoading(isLoading) {
+        const submitBtn = this.changePasswordForm.querySelector('.btn-change-password');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const btnLoading = submitBtn.querySelector('.btn-loading');
+
+        submitBtn.disabled = isLoading;
+        submitBtn.classList.toggle('loading', isLoading);
+        btnText.style.display = isLoading ? 'none' : 'inline';
+        btnLoading.style.display = isLoading ? 'inline' : 'none';
+    }
+
+    showChangePasswordMessage(message, type) {
+        if (this.changePasswordMessage) {
+            this.changePasswordMessage.textContent = message;
+            this.changePasswordMessage.className = type;
+            this.changePasswordMessage.style.display = 'block';
+        }
+    }
+
+    clearChangePasswordMessage() {
+        if (this.changePasswordMessage) {
+            this.changePasswordMessage.style.display = 'none';
+            this.changePasswordMessage.textContent = '';
+            this.changePasswordMessage.className = '';
+        }
+    }    resetRecoveryFlow() {
         this.currentUserId = null;
         this.currentContactValue = null;
         this.currentContactType = null;
+        this.currentToken = null;
         
         if (this.resendTimeout) {
             clearInterval(this.resendTimeout);

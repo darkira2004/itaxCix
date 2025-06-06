@@ -57,14 +57,22 @@ class PasswordRecoveryService {
                 message: `Se ha enviado un código de recuperación a tu ${contactMethod}.`,
                 userId: responseData.data?.userId || null, // Guardar userId para el siguiente paso
                 data: responseData.data || null
-            };
-
-        } catch (error) {
+            };        } catch (error) {
             console.error('Error al solicitar recuperación de contraseña:', error);
+            
+            // Mejorar manejo de errores específicos
+            let errorMessage = error.message || 'Error interno del servidor. Inténtalo más tarde.';
+              // Detectar errores SMTP específicos
+            if (errorMessage.toLowerCase().includes('smtp') || 
+                errorMessage.toLowerCase().includes('authentication') ||
+                errorMessage.toLowerCase().includes('mail') ||
+                errorMessage.toLowerCase().includes('invalid login')) {
+                errorMessage = 'Error temporal con el servicio de correo electrónico. Inténtalo de nuevo en unos minutos.';
+            }
             
             return {
                 success: false,
-                message: error.message || 'Error interno del servidor. Inténtalo más tarde.',
+                message: errorMessage,
                 data: null
             };
         }
@@ -158,6 +166,87 @@ class PasswordRecoveryService {
     }
 
     /**
+     * Reenvía el código de verificación al usuario
+     * @param {number} userId - ID del usuario
+     * @param {string} contactValue - Correo electrónico o número de teléfono del usuario
+     * @param {string} contactType - Tipo de contacto ('email' o 'phone')
+     * @returns {Promise<Object>} - Respuesta de la API
+     */
+    async resendVerificationCode(userId, contactValue, contactType = 'phone') {
+        try {
+            console.log(`Reenviando código de verificación para ${contactType}: ${contactValue}`);
+            
+            const url = `${this.baseUrl}/auth/recovery/start`;
+            
+            // Determinar contactTypeId según el tipo
+            const contactTypeId = contactType === 'email' ? 1 : 2;
+            
+            let formattedContactValue;
+            if (contactType === 'phone') {
+                formattedContactValue = this.formatPhoneNumber(contactValue.trim());
+            } else {
+                formattedContactValue = contactValue.trim().toLowerCase();
+            }
+            
+            const requestBody = {
+                contactTypeId,
+                contactValue: formattedContactValue,
+                userId: userId // Incluir userId para indicar que es un reenvío
+            };
+
+            console.log('Enviando datos para reenvío:', requestBody);
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            const responseData = await response.json();
+            console.log('Respuesta del servidor:', responseData);
+
+            if (!response.ok) {
+                throw new Error(responseData.message || `Error HTTP: ${response.status}`);
+            }
+
+            // Verificar si la respuesta fue exitosa
+            if (responseData.success === false) {
+                throw new Error(responseData.message || 'Error al reenviar código de verificación');
+            }
+
+            const contactMethod = contactType === 'email' ? 'correo electrónico' : 'número de teléfono';
+            return {
+                success: true,
+                message: `Se ha reenviado el código de verificación a tu ${contactMethod}.`,
+                data: responseData.data || null
+            };
+
+        } catch (error) {
+            console.error('Error al reenviar código de verificación:', error);
+            
+            // Mejorar manejo de errores específicos
+            let errorMessage = error.message || 'Error interno del servidor. Inténtalo más tarde.';
+            
+            // Detectar errores SMTP específicos
+            if (errorMessage.toLowerCase().includes('smtp') || 
+                errorMessage.toLowerCase().includes('authentication') ||
+                errorMessage.toLowerCase().includes('mail') ||
+                errorMessage.toLowerCase().includes('invalid login')) {
+                errorMessage = 'Error temporal con el servicio de correo electrónico. Inténtalo de nuevo en unos minutos.';
+            }
+            
+            return {
+                success: false,
+                message: errorMessage,
+                data: null
+            };
+        }
+    }
+
+    /**
      * Valida el formato del correo electrónico
      * @param {string} email - Correo electrónico a validar
      * @returns {boolean} - true si es válido, false si no
@@ -236,8 +325,88 @@ class PasswordRecoveryService {
                 cleaned = '+51' + cleaned;
             }
         }
-        
-        return cleaned;
+          return cleaned;
+    }    /**
+     * Cambia la contraseña del usuario después de la verificación
+     * @param {number} userId - ID del usuario
+     * @param {string} newPassword - Nueva contraseña
+     * @param {string} repeatPassword - Repetir nueva contraseña
+     * @param {string} token - Token de autorización obtenido en la verificación
+     * @returns {Promise<Object>} - Respuesta de la API
+     */
+    async changePassword(userId, newPassword, repeatPassword, token) {
+        try {
+            console.log(`Cambiando contraseña para usuario: ${userId}`);
+            
+            const url = `${this.baseUrl}/auth/recovery/change-password`;
+            
+            const requestBody = {
+                userId: userId,
+                newPassword: newPassword,
+                repeatPassword: repeatPassword
+            };
+
+            console.log('Enviando solicitud de cambio de contraseña...');
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            const data = await response.json();
+            
+            console.log('Respuesta del servidor:', data);
+
+            if (data.success) {
+                return {
+                    success: true,
+                    message: data.data?.message || 'Contraseña cambiada exitosamente'
+                };
+            } else {
+                return {
+                    success: false,
+                    message: data.error?.message || data.message || 'Error al cambiar la contraseña'
+                };
+            }
+
+        } catch (error) {
+            console.error('Error al cambiar contraseña:', error);
+            return {
+                success: false,
+                message: 'Error de conexión. Inténtalo más tarde.'
+            };
+        }
+    }
+
+    /**
+     * Valida que la contraseña cumpla con los requisitos de seguridad
+     * @param {string} password - Contraseña a validar
+     * @returns {Object} - Resultado de la validación con detalles
+     */
+    validatePasswordStrength(password) {
+        if (!password) {
+            return { isValid: false, message: 'La contraseña es requerida' };
+        }
+
+        const requirements = {
+            length: password.length >= 8,
+            uppercase: /[A-Z]/.test(password),
+            lowercase: /[a-z]/.test(password),
+            number: /[0-9]/.test(password),
+            special: /[@$!%*?&]/.test(password)
+        };
+
+        const isValid = Object.values(requirements).every(req => req);
+
+        return {
+            isValid,
+            requirements,
+            message: isValid ? 'Contraseña válida' : 'La contraseña no cumple con todos los requisitos'
+        };
     }
 }
 
