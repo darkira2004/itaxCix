@@ -23,15 +23,14 @@
   
   <!-- Font Awesome para el icono del ojo -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
   <title>Login - Panel iTaxCix</title>
   <link rel="stylesheet" href="assets/css/login.css">
+  <link rel="stylesheet" href="assets/css/password-recovery.css">
 </head>
 <body onload="noBack();" onpageshow="if (event.persisted) noBack();" onunload="">
  <div class="marco">
-  <div class="login-container">
-    <!-- Logo -->
+  <div class="login-container">    <!-- Logo -->
     <img src="assets/Recourse/Logo/2.png" alt="Logo de la Municipalidad" class="logo">
     <img src="assets/Recourse/Imagenes/register_validation_admin.webp" alt="Logo de la Municipalidad" class="imagen">
  
@@ -45,8 +44,51 @@
 </button>
     </form>
 
+    <!-- Enlace para recuperar contraseña -->
+    <div class="forgot-password-link">
+      <a href="#" id="forgot-password-btn">¿Olvidaste tu contraseña?</a>
+    </div>
+
     <!-- Mensaje de error -->
-    <p id="error-msg" style="color: red; display: none;">Usuario o contraseña incorrectos</p>
+    <p id="error-msg" style="color: red; display: none;">Usuario o contraseña incorrectos</p>  </div>
+</div>
+
+<!-- Modal para recuperar contraseña -->
+<div id="forgot-password-modal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Recuperar Contraseña</h3>
+      <span class="close-btn" id="close-modal">&times;</span>
+    </div>    <div class="modal-body">
+      <p>Selecciona cómo quieres recibir el código de recuperación:</p>
+      <form id="forgot-password-form">
+        <!-- Selector de tipo de contacto -->
+        <div class="contact-type-selector">
+          <label>
+            <input type="radio" name="contactType" value="email" checked>
+            <span class="radio-label">Correo electrónico</span>
+          </label>
+          <label>
+            <input type="radio" name="contactType" value="phone">
+            <span class="radio-label">Número de teléfono</span>
+          </label>
+        </div>
+        
+        <!-- Input dinámico que cambia según la selección -->
+        <input 
+          id="recovery-contact" 
+          type="email" 
+          placeholder="Correo electrónico" 
+          required
+        />
+        
+        <button type="submit" class="btn-recovery">
+          <span class="btn-text">Enviar código</span>
+          <span class="btn-loading" style="display: none;">Enviando...</span>
+        </button>
+      </form>
+      <p id="recovery-message" style="display: none;"></p>
+    </div>
   </div>
 </div>
 
@@ -61,6 +103,7 @@ window.addEventListener('pageshow', function(event) {
 <!-- Cargar el archivo JavaScript externo -->
 <script src="./assets/js/utils/session-cleaner.js"></script>
 <script src="./assets/js/api/services/login-service.js"></script>
+<script src="./assets/js/api/services/password-recovery-service.js"></script>
 <script src="./assets/js/ui/controllers/login-controller.js"></script>
 <script src="../../assets/js/utils/route-guard.js"></script>
 

@@ -283,3 +283,75 @@ body {
   color: #3981ff; /* Un tono más claro al pasar el mouse */
   text-decoration: underline;
 }
+
+/* Media queries para diferentes tamaños de pantalla */
+@media (max-width: 768px) {
+  .marco {
+    min-height: 400px;
+    background-size: cover;
+    width: 95%;
+    height: auto;
+    border-radius: 15px; /* Reducido aún más */
+    padding: 15px;
+  }
+
+  .login-container {
+    max-width: 320px;
+    width: 100%;
+    padding: 25px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    align-items: center;
+    padding: 15px; /* Añadido padding al body */
+  }
+
+  .marco {
+    min-height: auto; /* Cambiado de 100vh a auto */
+    border-radius: 10px; /* Bordes más pequeños pero no eliminados */
+    width: 100%;
+    margin: 0;
+    padding: 10px;
+  }
+
+  .login-container {
+    width: 100%; /* Cambiado de 85% a 100% */
+    max-width: 100%; /* Ocupar todo el ancho disponible */
+    padding: 20px 15px;
+  }
+
+  .imagen {
+    padding: 5px;
+    width: 70%; /* Reducido de 90% */
+    max-width: 180px; /* Reducido de 280px */
+  }
+
+  .login-form button,
+  .btn-ingresar {
+    font-size: 1rem; /* Reducido ligeramente */
+    padding: 15px 0;
+  }
+
+  .login-form input {
+    padding: 12px 10px;
+    font-size: 16px;
+  }
+
+  .login-container h2 {
+    font-size: 1.3rem; /* Reducido el tamaño */
+    padding: 5px 0;
+  }
+}
+
+/* Media query adicional para pantallas muy pequeñas */
+@media (max-width: 360px) {
+  .marco {
+    padding: 5px;
+  }
+  .imagen {
+    width: 60%;
+    max-width: 150px;
+  }
+}
