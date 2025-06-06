@@ -51,12 +51,11 @@ class PasswordRecoveryService {
             // Verificar si la respuesta fue exitosa
             if (responseData.success === false) {
                 throw new Error(responseData.message || 'Error al solicitar recuperación de contraseña');
-            }
-
-            const contactMethod = contactType === 'email' ? 'correo electrónico' : 'número de teléfono';
+            }            const contactMethod = contactType === 'email' ? 'correo electrónico' : 'número de teléfono';
             return {
                 success: true,
                 message: `Se ha enviado un código de recuperación a tu ${contactMethod}.`,
+                userId: responseData.data?.userId || null, // Guardar userId para el siguiente paso
                 data: responseData.data || null
             };
 
@@ -70,6 +69,95 @@ class PasswordRecoveryService {
             };
         }
     }    /**
+     * Verifica el código de recuperación de contraseña
+     * @param {number} userId - ID del usuario
+     * @param {string} code - Código de recuperación recibido
+     * @returns {Promise<Object>} - Respuesta de la API
+     */
+    async verifyRecoveryCode(userId, code) {
+        try {
+            console.log(`Verificando código de recuperación para usuario ${userId}: ${code}`);
+            
+            const url = `${this.baseUrl}/auth/recovery/verify-code`;
+            
+            // Validaciones básicas
+            if (!userId) {
+                throw new Error('userId es requerido');
+            }
+            
+            if (!code || typeof code !== 'string' || code.trim().length === 0) {
+                throw new Error('El código de recuperación es requerido');
+            }
+            
+            const requestBody = {
+                userId: parseInt(userId),
+                code: code.trim().toUpperCase() // Normalizar código a mayúsculas
+            };
+
+            console.log('Enviando datos para verificación:', requestBody);
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            const responseData = await response.json();
+            console.log('Respuesta del servidor:', responseData);
+
+            // Manejar errores HTTP
+            if (!response.ok) {
+                if (responseData.error && responseData.error.message) {
+                    throw new Error(responseData.error.message);
+                }
+                throw new Error(responseData.message || `Error HTTP: ${response.status}`);
+            }
+
+            // Verificar si la respuesta fue exitosa
+            if (responseData.success === false) {
+                const errorMessage = responseData.error?.message || responseData.message || 'Error al verificar el código de recuperación';
+                throw new Error(errorMessage);
+            }
+
+            // Respuesta exitosa
+            return {
+                success: true,
+                message: responseData.data?.message || 'Código verificado correctamente',
+                token: responseData.data?.token || null,
+                data: responseData.data || null
+            };
+
+        } catch (error) {
+            console.error('Error al verificar código de recuperación:', error);
+            
+            // Determinar el tipo de error y mensaje apropiado
+            let errorMessage = error.message;
+            
+            if (error.message.includes('código de recuperación no es válido') || 
+                error.message.includes('expirado') || 
+                error.message.includes('inválido')) {
+                errorMessage = 'El código de recuperación no es válido o ha expirado. Solicita un nuevo código.';
+            } else if (error.message.includes('requerido')) {
+                errorMessage = 'Datos incompletos. Verifica e inténtalo nuevamente.';
+            } else if (error.message.includes('Error interno del servidor')) {
+                errorMessage = 'Error interno del servidor. Inténtalo más tarde.';
+            } else if (!error.message || error.message.includes('fetch')) {
+                errorMessage = 'Error de conexión. Verifica tu conexión a internet e inténtalo nuevamente.';
+            }
+            
+            return {
+                success: false,
+                message: errorMessage,
+                token: null,
+                data: null
+            };
+        }
+    }
+
+    /**
      * Valida el formato del correo electrónico
      * @param {string} email - Correo electrónico a validar
      * @returns {boolean} - true si es válido, false si no
@@ -105,6 +193,27 @@ class PasswordRecoveryService {
         const isNumeric = /^\d+$/.test(numbersOnly);
         
         return isValidLength && isNumeric;
+    }
+
+    /**
+     * Valida el formato del código de recuperación
+     * @param {string} code - Código a validar
+     * @returns {boolean} - true si es válido, false si no
+     */
+    validateCodeFormat(code) {
+        if (!code || typeof code !== 'string') {
+            return false;
+        }
+
+        const cleaned = code.trim();
+        
+        // El código debe tener entre 4 y 8 caracteres alfanuméricos
+        const isValidLength = cleaned.length >= 4 && cleaned.length <= 8;
+        
+        // Verificar que solo contenga letras y números
+        const isAlphaNumeric = /^[A-Za-z0-9]+$/.test(cleaned);
+        
+        return isValidLength && isAlphaNumeric;
     }
 
     /**

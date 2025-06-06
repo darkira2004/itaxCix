@@ -4,19 +4,8 @@ class LoginController {
         this.errorMsg = document.getElementById('error-msg');
         this.submitBtn = this.form.querySelector('.btn-ingresar');
         this.btnText = this.submitBtn.querySelector('.btn-text');
-        this.btnLoading = this.submitBtn.querySelector('.btn-loading');
-        this.loginService = window.LoginService;
-          // Elementos para recuperar contraseña
-        this.forgotPasswordBtn = document.getElementById('forgot-password-btn');
-        this.forgotPasswordModal = document.getElementById('forgot-password-modal');
-        this.closeModalBtn = document.getElementById('close-modal');
-        this.forgotPasswordForm = document.getElementById('forgot-password-form');
-        this.recoveryContactInput = document.getElementById('recovery-contact');
-        this.recoveryMessage = document.getElementById('recovery-message');
-        this.recoveryService = new PasswordRecoveryService();
+        this.btnLoading = this.submitBtn.querySelector('.btn-loading');        this.loginService = window.LoginService;
         
-        // Elementos del selector de tipo de contacto
-        this.contactTypeRadios = document.querySelectorAll('input[name="contactType"]');
           this.baseUrl = window.location.hostname.includes('github.io') 
             ? '/itaxCix'
             : '';
@@ -26,13 +15,8 @@ class LoginController {
         this.form.addEventListener('submit', async (e) => {
             e.preventDefault();
             await this.handleLogin();
-        });
-
-        // Configurar toggle de contraseña
+        });        // Configurar toggle de contraseña
         this.setupPasswordToggle();
-
-        // Configurar funcionalidad de recuperar contraseña
-        this.setupPasswordRecovery();
     }    /**
      * Configura la funcionalidad para mostrar/ocultar contraseña
      */
@@ -59,159 +43,7 @@ class LoginController {
             
             // Establecer título inicial
             eyeIcon.setAttribute('title', 'Mostrar contraseña');
-        }
-    }
-
-    setupPasswordRecovery() {
-        // Abrir modal al hacer clic en "¿Olvidaste tu contraseña?"
-        if (this.forgotPasswordBtn) {
-            this.forgotPasswordBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.openRecoveryModal();
-            });
-        }
-
-        // Cerrar modal
-        if (this.closeModalBtn) {
-            this.closeModalBtn.addEventListener('click', () => {
-                this.closeRecoveryModal();
-            });
-        }
-
-        // Cerrar modal al hacer clic fuera de él
-        if (this.forgotPasswordModal) {
-            this.forgotPasswordModal.addEventListener('click', (e) => {
-                if (e.target === this.forgotPasswordModal) {
-                    this.closeRecoveryModal();
-                }
-            });
-        }        // Manejar envío del formulario de recuperación
-        if (this.forgotPasswordForm) {
-            this.forgotPasswordForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await this.handlePasswordRecovery();
-            });
-        }
-
-        // Configurar cambio de tipo de contacto
-        this.setupContactTypeSelector();
-    }    setupContactTypeSelector() {
-        this.contactTypeRadios.forEach(radio => {
-            radio.addEventListener('change', () => {
-                this.updateContactInput();
-            });
-        });
-        
-        // Configurar el input inicial
-        this.updateContactInput();
-    }
-
-    updateContactInput() {
-        const selectedType = document.querySelector('input[name="contactType"]:checked')?.value;
-        
-        if (selectedType === 'email') {
-            this.recoveryContactInput.type = 'email';
-            this.recoveryContactInput.placeholder = 'Correo electrónico';
-            this.recoveryContactInput.value = '';
-        } else if (selectedType === 'phone') {
-            this.recoveryContactInput.type = 'tel';
-            this.recoveryContactInput.placeholder = 'Número de teléfono';
-            this.recoveryContactInput.value = '';
-        }
-    }
-
-    openRecoveryModal() {
-        if (this.forgotPasswordModal) {
-            this.forgotPasswordModal.style.display = 'flex';
-            this.recoveryContactInput.focus();
-            this.clearRecoveryMessage();
-            this.updateContactInput(); // Asegurar que el input esté configurado correctamente
-        }
-    }
-
-    closeRecoveryModal() {
-        if (this.forgotPasswordModal) {
-            this.forgotPasswordModal.style.display = 'none';
-            this.recoveryContactInput.value = '';
-            this.clearRecoveryMessage();
-            // Resetear a email por defecto
-            document.querySelector('input[name="contactType"][value="email"]').checked = true;
-            this.updateContactInput();
-        }
-    }    async handlePasswordRecovery() {
-        const contactValue = this.recoveryContactInput.value.trim();
-        const selectedType = document.querySelector('input[name="contactType"]:checked')?.value;
-        
-        // Validar campo vacío
-        if (!contactValue) {
-            const fieldName = selectedType === 'email' ? 'correo electrónico' : 'número de teléfono';
-            this.showRecoveryMessage(`Por favor, ingresa tu ${fieldName}.`, 'error');
-            return;
-        }
-
-        // Validación específica según el tipo
-        if (selectedType === 'email') {
-            if (!this.recoveryService.validateEmailFormat(contactValue)) {
-                this.showRecoveryMessage('Por favor, ingresa un correo electrónico válido.', 'error');
-                return;
-            }
-        } else if (selectedType === 'phone') {
-            if (!this.recoveryService.validatePhoneFormat(contactValue)) {
-                this.showRecoveryMessage('Por favor, ingresa un número de teléfono válido (9-15 dígitos).', 'error');
-                return;
-            }
-        }
-
-        try {
-            this.setRecoveryLoading(true);
-            this.clearRecoveryMessage();
-
-            const result = await this.recoveryService.requestPasswordReset(contactValue, selectedType);
-
-            if (result.success) {
-                this.showRecoveryMessage(result.message, 'success');
-                // Cerrar modal después de 3 segundos si fue exitoso
-                setTimeout(() => {
-                    this.closeRecoveryModal();
-                }, 3000);
-            } else {
-                this.showRecoveryMessage(result.message, 'error');
-            }
-
-        } catch (error) {
-            console.error('Error en recuperación de contraseña:', error);
-            this.showRecoveryMessage('Error interno. Inténtalo más tarde.', 'error');
-        } finally {
-            this.setRecoveryLoading(false);
-        }
-    }
-
-    setRecoveryLoading(isLoading) {
-        const submitBtn = this.forgotPasswordForm.querySelector('.btn-recovery');
-        const btnText = submitBtn.querySelector('.btn-text');
-        const btnLoading = submitBtn.querySelector('.btn-loading');
-
-        submitBtn.disabled = isLoading;
-        submitBtn.classList.toggle('loading', isLoading);
-        btnText.style.display = isLoading ? 'none' : 'inline';
-        btnLoading.style.display = isLoading ? 'inline' : 'none';
-    }
-
-    showRecoveryMessage(message, type) {
-        if (this.recoveryMessage) {
-            this.recoveryMessage.textContent = message;
-            this.recoveryMessage.className = type;
-            this.recoveryMessage.style.display = 'block';
-        }
-    }
-
-    clearRecoveryMessage() {
-        if (this.recoveryMessage) {
-            this.recoveryMessage.style.display = 'none';
-            this.recoveryMessage.textContent = '';
-            this.recoveryMessage.className = '';
-        }
-    }
+        }    }
 
     setLoading(isLoading) {
         this.submitBtn.disabled = isLoading;

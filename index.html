@@ -95,6 +95,52 @@
   </div>
 </div>
 
+<!-- Modal para verificar código de recuperación -->
+<div id="verify-code-modal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="verify-code-header">
+      <button class="back-btn" id="back-to-recovery" title="Volver">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h3>Verificar Código</h3>
+    </div>
+    
+    <div class="verify-code-body">
+      <div class="verification-info">
+        <p>Ingresa el código de verificación que enviamos a:</p>
+        <div class="contact-display" id="contact-display"></div>
+      </div>
+      
+      <form id="verify-code-form">
+        <div class="code-input-container">
+          <input 
+            id="verification-code" 
+            type="text" 
+            placeholder="Ingresa el código" 
+            maxlength="8"
+            required
+            autocomplete="off"
+          />
+        </div>
+        
+        <div class="resend-code-container">
+          <button type="button" class="resend-code-btn" id="resend-code-btn">
+            Reenviar código
+          </button>
+          <span class="resend-timer" id="resend-timer" style="display: none;"></span>
+        </div>
+        
+        <button type="submit" class="btn-verify">
+          <span class="btn-text">Verificar código</span>
+          <span class="btn-loading" style="display: none;">Verificando...</span>
+        </button>
+      </form>
+      
+      <p id="verification-message" style="display: none;"></p>
+    </div>
+  </div>
+</div>
+
 <script>
 window.addEventListener('pageshow', function(event) {
     if (event.persisted) {
@@ -108,6 +154,7 @@ window.addEventListener('pageshow', function(event) {
 <script src="./assets/js/api/services/login-service.js"></script>
 <script src="./assets/js/api/services/password-recovery-service.js"></script>
 <script src="./assets/js/ui/controllers/login-controller.js"></script>
+<script src="./assets/js/ui/controllers/password-recovery-controller.js"></script>
 <script src="../../assets/js/utils/route-guard.js"></script>
 
 
