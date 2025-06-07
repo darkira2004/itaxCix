@@ -17,6 +17,9 @@ class LoginController {
             await this.handleLogin();
         });        // Configurar toggle de contraseña
         this.setupPasswordToggle();
+        
+        // Configurar validación del documento
+        this.setupDocumentValidation();
     }    /**
      * Configura la funcionalidad para mostrar/ocultar contraseña
      */
@@ -49,17 +52,26 @@ class LoginController {
         this.submitBtn.disabled = isLoading;
         this.btnText.style.display = isLoading ? 'none' : 'inline';
         this.btnLoading.style.display = isLoading ? 'inline' : 'none';
-    }
-
-    async handleLogin() {
+    }    async handleLogin() {
         const documentInput = document.getElementById('documentValue');
         const passwordInput = document.getElementById('password');
         if (!documentInput || !passwordInput) {
             this.showError("Error interno: formulario no disponible.");
             return;
         }
-        const documentValue = documentInput.value;
+        const documentValue = documentInput.value.trim();
         const password = passwordInput.value;
+
+        // Validar que el documento tenga exactamente 8 dígitos numéricos
+        if (!documentValue) {
+            this.showError("Por favor, ingresa tu número de documento.");
+            return;
+        }
+        
+        if (!/^[0-9]{8}$/.test(documentValue)) {
+            this.showError("El documento debe contener exactamente 8 dígitos numéricos.");
+            return;
+        }
 
         try {
             this.setLoading(true);
@@ -98,6 +110,63 @@ class LoginController {
         setTimeout(() => {
             this.errorMsg.style.display = 'none';
         }, 3000);
+   }
+
+    /**
+     * Configura la validación del campo de documento
+     * Solo permite 8 dígitos numéricos
+     */
+    setupDocumentValidation() {
+        const documentInput = document.getElementById('documentValue');
+        
+        if (documentInput) {
+            // Evento para filtrar solo números y limitar a 8 dígitos
+            documentInput.addEventListener('input', (e) => {
+                // Remover cualquier carácter que no sea número
+                let value = e.target.value.replace(/[^0-9]/g, '');
+                
+                // Limitar a máximo 8 dígitos
+                if (value.length > 8) {
+                    value = value.slice(0, 8);
+                }
+                
+                // Actualizar el valor del input
+                e.target.value = value;
+            });
+            
+            // Prevenir pegar texto que no sean números
+            documentInput.addEventListener('paste', (e) => {
+                e.preventDefault();
+                
+                // Obtener texto del clipboard
+                const paste = (e.clipboardData || window.clipboardData).getData('text');
+                
+                // Filtrar solo números y limitar a 8 dígitos
+                const filteredPaste = paste.replace(/[^0-9]/g, '').slice(0, 8);
+                
+                // Establecer el valor filtrado
+                documentInput.value = filteredPaste;
+            });
+            
+            // Prevenir entrada de teclas no numéricas (excepto teclas de control)
+            documentInput.addEventListener('keypress', (e) => {
+                // Permitir teclas de control (backspace, delete, tab, etc.)
+                if (e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Tab' || 
+                    e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'Home' || e.key === 'End') {
+                    return;
+                }
+                
+                // Permitir solo números (0-9)
+                if (!/^[0-9]$/.test(e.key)) {
+                    e.preventDefault();
+                }
+                
+                // Prevenir entrada si ya tiene 8 dígitos
+                if (documentInput.value.length >= 8) {
+                    e.preventDefault();
+                }
+            });
+        }
     }
 }
 

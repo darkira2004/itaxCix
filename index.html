@@ -34,7 +34,7 @@
     <img src="assets/Recourse/Logo/2.png" alt="Logo de la Municipalidad" class="logo">
     <img src="assets/Recourse/Imagenes/register_validation_admin.webp" alt="Logo de la Municipalidad" class="imagen">    <!-- Formulario de login -->
     <form class="login-form" id="login-form">
-      <input id="documentValue" type="text" placeholder="Documento" />
+      <input id="documentValue" type="text" placeholder="Documento (8 dígitos)" maxlength="8" pattern="[0-9]{8}" inputmode="numeric" />
       <div class="password-input-container">
         <input id="password" type="password" placeholder="Contraseña" />
         
