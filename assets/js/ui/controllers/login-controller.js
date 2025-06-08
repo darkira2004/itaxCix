@@ -71,34 +71,68 @@ class LoginController {
         if (!/^[0-9]{8}$/.test(documentValue)) {
             this.showError("El documento debe contener exactamente 8 dígitos numéricos.");
             return;
-        }
-
-        try {
+        }        try {
             this.setLoading(true);
             const response = await this.loginService.verifyCredentials(documentValue, password);
 
-            // Soporta tanto mock (objeto plano) como API real ({success, data})
-            const data = response && response.data ? response.data : response;
-
-            if (data && data.token) {
+            // La respuesta exitosa debe contener el token y otros datos
+            if (response && response.token) {
+                // Limpiar sessionStorage antes de guardar nuevos datos
                 sessionStorage.clear();
+                
+                // Guardar datos de autenticación
                 sessionStorage.setItem("isLoggedIn", "true");
-                sessionStorage.setItem("authToken", data.token);
-                sessionStorage.setItem("userId", data.userId.toString());
-                sessionStorage.setItem("documentValue", data.documentValue);
-                sessionStorage.setItem("userRoles", JSON.stringify(data.roles));
-                sessionStorage.setItem("userPermissions", JSON.stringify(data.permissions));
-                sessionStorage.setItem("userAvailability", data.availability?.toString() ?? "true");
+                sessionStorage.setItem("authToken", response.token);
+                sessionStorage.setItem("userId", response.userId?.toString() || "");
+                sessionStorage.setItem("documentValue", response.documentValue || documentValue);
+                sessionStorage.setItem("userRoles", JSON.stringify(response.roles || []));
+                sessionStorage.setItem("userPermissions", JSON.stringify(response.permissions || []));
+                sessionStorage.setItem("userAvailability", response.availability?.toString() ?? "true");
                 sessionStorage.setItem("loginTime", Date.now().toString());
 
+                // Prevenir navegación hacia atrás y redirigir
                 window.history.pushState(null, '', window.location.href);
                 window.location.replace(`${this.baseUrl}/pages/usuarios/ControlAdmisionConductores.html`);
             } else {
-                this.showError((response && response.message) || "Error de autenticación");
-            }
-        } catch (error) {
+                this.showError("Error en la respuesta del servidor. Inténtalo de nuevo.");
+            }        } catch (error) {
             console.error('Error durante el login:', error);
-            this.showError("Error en el servidor");
+            
+            // Mapear errores a mensajes amigables para el usuario
+            let errorMessage = "Error inesperado. Inténtalo de nuevo.";
+            
+            if (error.message) {
+                const msg = error.message.toLowerCase();
+                
+                if (msg.includes('documento o contraseña incorrectos') || 
+                    msg.includes('credenciales inválidas') ||
+                    msg.includes('credenciales incorrectas')) {
+                    errorMessage = "Documento o contraseña incorrectos. Verifica tus datos.";
+                } else if (msg.includes('usuario y contraseña son requeridos')) {
+                    errorMessage = "Por favor, completa todos los campos.";
+                } else if (msg.includes('error interno del servidor')) {
+                    errorMessage = "El servidor no está disponible. Inténtalo más tarde.";
+                } else if (msg.includes('certificado ssl') || 
+                          msg.includes('certificate') ||
+                          msg.includes('ssl') ||
+                          msg.includes('contacta al administrador')) {
+                    errorMessage = "Error de certificado SSL del servidor. ";
+                    this.showSSLError();
+                    return; // No mostrar error normal, mostrar panel SSL
+                } else if (msg.includes('error en la comunicación') || 
+                          msg.includes('network') || 
+                          msg.includes('fetch') ||
+                          msg.includes('conexión')) {
+                    errorMessage = "Error de conexión. Verifica tu internet o que el servidor esté disponible.";
+                } else if (msg.includes('respuesta del servidor incompleta')) {
+                    errorMessage = "Error en la respuesta del servidor.";
+                } else {
+                    // Usar el mensaje original si es descriptivo
+                    errorMessage = error.message;
+                }
+            }
+            
+            this.showError(errorMessage);
         } finally {
             this.setLoading(false);
         }
@@ -109,8 +143,76 @@ class LoginController {
         this.errorMsg.style.display = 'block';
         setTimeout(() => {
             this.errorMsg.style.display = 'none';
-        }, 3000);
-   }
+        }, 5000);
+    }
+
+    showSSLError() {
+        // Crear un panel especial para errores SSL
+        const sslPanel = document.createElement('div');
+        sslPanel.id = 'ssl-error-panel';
+        sslPanel.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 2px solid #dc3545;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 600px;
+            z-index: 10000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        `;
+        
+        sslPanel.innerHTML = `
+            <h3 style="color: #dc3545; margin-top: 0;">🔒 Error de Certificado SSL</h3>
+            <p><strong>El servidor tiene un certificado SSL inválido.</strong></p>
+            <p>Por eso funciona en Postman pero no en el navegador.</p>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                <h4>💡 Soluciones:</h4>
+                <ol>
+                    <li><strong>Visita:</strong> <a href="https://149.130.161.148" target="_blank">https://149.130.161.148</a> y acepta el certificado</li>
+                    <li><strong>O usa Chrome en modo desarrollo</strong> (ver herramienta de diagnóstico)</li>
+                    <li><strong>O contacta al administrador</strong> del servidor</li>
+                </ol>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button onclick="window.open('${this.baseUrl}/ssl-diagnostic.html', '_blank')" 
+                        style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px; cursor: pointer;">
+                    🛠️ Herramienta de Diagnóstico
+                </button>
+                <button onclick="window.open('https://149.130.161.148', '_blank')" 
+                        style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px; cursor: pointer;">
+                    🔗 Abrir Servidor
+                </button>
+                <button onclick="document.getElementById('ssl-error-panel').remove()" 
+                        style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px; cursor: pointer;">
+                    ❌ Cerrar
+                </button>
+            </div>
+        `;
+        
+        // Agregar overlay
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+        `;
+        overlay.onclick = () => {
+            document.body.removeChild(overlay);
+            document.body.removeChild(sslPanel);
+        };
+        
+        document.body.appendChild(overlay);
+        document.body.appendChild(sslPanel);
+    }
 
     /**
      * Configura la validación del campo de documento
