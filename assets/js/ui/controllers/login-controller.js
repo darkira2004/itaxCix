@@ -73,14 +73,22 @@ class LoginController {
             return;
         }        try {
             this.setLoading(true);
-            const response = await this.loginService.verifyCredentials(documentValue, password);
-
-            // La respuesta exitosa debe contener el token y otros datos
+            const response = await this.loginService.verifyCredentials(documentValue, password);            // La respuesta exitosa debe contener el token y otros datos
             if (response && response.token) {
+                console.log('✅ Login exitoso, datos recibidos:', {
+                    userId: response.userId,
+                    documentValue: response.documentValue,
+                    firstName: response.firstName,
+                    lastName: response.lastName,
+                    roles: response.roles,
+                    permissions: response.permissions,
+                    rating: response.rating,
+                    hasToken: !!response.token
+                });
+                
                 // Limpiar sessionStorage antes de guardar nuevos datos
                 sessionStorage.clear();
-                
-                // Guardar datos de autenticación
+                  // Guardar datos de autenticación
                 sessionStorage.setItem("isLoggedIn", "true");
                 sessionStorage.setItem("authToken", response.token);
                 sessionStorage.setItem("userId", response.userId?.toString() || "");
@@ -88,6 +96,13 @@ class LoginController {
                 sessionStorage.setItem("userRoles", JSON.stringify(response.roles || []));
                 sessionStorage.setItem("userPermissions", JSON.stringify(response.permissions || []));
                 sessionStorage.setItem("userAvailability", response.availability?.toString() ?? "true");
+                
+                // Guardar información del nombre del usuario
+                sessionStorage.setItem("firstName", response.firstName || "");
+                sessionStorage.setItem("lastName", response.lastName || "");
+                sessionStorage.setItem("userFullName", `${response.firstName || ""} ${response.lastName || ""}`.trim());
+                sessionStorage.setItem("userRating", response.rating?.toString() || "0");
+                
                 sessionStorage.setItem("loginTime", Date.now().toString());
 
                 // Prevenir navegación hacia atrás y redirigir

@@ -20,24 +20,41 @@ function checkAuthentication() {
 
 /**
  * Actualiza la información del usuario en la interfaz.
- * Muestra el número de documento si está disponible, si no muestra el ID de usuario.
+ * Muestra el nombre completo del usuario si está disponible, 
+ * caso contrario muestra el número de documento, y como último recurso el ID de usuario.
  */
 function updateUserDisplay() {
-    // Obtiene el número de documento del usuario desde sessionStorage
+    // Obtiene la información del usuario desde sessionStorage
+    const fullName = sessionStorage.getItem("userFullName");
+    const firstName = sessionStorage.getItem("firstName");
+    const lastName = sessionStorage.getItem("lastName");
     const documentValue = sessionStorage.getItem("documentValue");
+    const userId = sessionStorage.getItem("userId");
+    
     // Obtiene el elemento donde se muestra el usuario
     const userDisplay = document.getElementById("user-display");
 
     if (userDisplay) {
-        if (documentValue) {
-            // Si hay documento, lo muestra
-            userDisplay.textContent = documentValue;
-        } else {
-            // Si no, muestra el ID de usuario como fallback
-            const userId = sessionStorage.getItem("userId");
-            if (userId) {
-                userDisplay.textContent = "Usuario " + userId;
-            }
+        // Prioridad 1: Nombre completo
+        if (fullName && fullName.trim() !== "") {
+            userDisplay.textContent = fullName.trim();
+        }
+        // Prioridad 2: Nombre y apellido por separado
+        else if (firstName || lastName) {
+            const displayName = `${firstName || ""} ${lastName || ""}`.trim();
+            userDisplay.textContent = displayName || "Admin";
+        }
+        // Prioridad 3: Número de documento
+        else if (documentValue) {
+            userDisplay.textContent = `Doc. ${documentValue}`;
+        }
+        // Prioridad 4: ID de usuario como último recurso
+        else if (userId) {
+            userDisplay.textContent = `Usuario ${userId}`;
+        }
+        // Fallback: Texto por defecto
+        else {
+            userDisplay.textContent = "Admin";
         }
     }
 }

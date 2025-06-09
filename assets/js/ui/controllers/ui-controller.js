@@ -26,9 +26,7 @@ class UIController {
         this.openSidebarBtn = document.getElementById('open-sidebar');
         this.closeSidebarBtn = document.getElementById('close-sidebar');
         this.mainContent = document.querySelector('.main-content');
-    }
-
-    // Método principal que inicializa la aplicación - CORREGIDO
+    }    // Método principal que inicializa la aplicación - CORREGIDO
     // Es async porque realiza operaciones asíncronas (como cargar datos de la API)
     async init() {
         try {
@@ -40,10 +38,23 @@ class UIController {
             // CONVERTIR A INSTANCIAS DE LA CLASE CONDUCTOR
             const conductores = conductoresData.map(data => Conductor.fromApiData(data));
 
-            // Ahora usar las instancias de la clase
-            conductores.forEach(conductor => {
-                this.renderConductor(conductor);
-            });
+            // Verificar si hay conductores pendientes
+            if (conductores.length === 0) {
+                // No hay conductores pendientes - mostrar mensaje
+                this.driversList.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="no-data">
+                            <i class="fas fa-info-circle"></i>
+                            Aún no hay solicitudes de conductores pendientes por revisar.
+                        </td>
+                    </tr>
+                `;
+            } else {
+                // Renderizar conductores existentes
+                conductores.forEach(conductor => {
+                    this.renderConductor(conductor);
+                });
+            }
 
             this.initializeEvents();
             this.showLoading(false);
@@ -247,18 +258,30 @@ class UIController {
             this.showToast('Error al rechazar conductor: ' + error.message, 'error');
             this.showLoading(false);
         }
-    }
-
-    // Método para recargar conductores - NUEVO
+    }    // Método para recargar conductores - NUEVO
     async recargarConductores() {
         try {
             this.driversList.innerHTML = '';
             const conductoresData = await this.conductorService.obtenerConductoresPendientes(0, 10);
             const conductores = conductoresData.map(data => Conductor.fromApiData(data));
             
-            conductores.forEach(conductor => {
-                this.renderConductor(conductor);
-            });
+            // Verificar si hay conductores pendientes
+            if (conductores.length === 0) {
+                // No hay conductores pendientes - mostrar mensaje
+                this.driversList.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="no-data">
+                            <i class="fas fa-info-circle"></i>
+                            Aún no hay solicitudes de conductores pendientes por revisar.
+                        </td>
+                    </tr>
+                `;
+            } else {
+                // Renderizar conductores existentes
+                conductores.forEach(conductor => {
+                    this.renderConductor(conductor);
+                });
+            }
         } catch (error) {
             console.error('Error al recargar conductores:', error);
             this.showToast('Error al recargar la lista de conductores', 'error');
@@ -304,7 +327,44 @@ console.log("isLoggedIn:", sessionStorage.getItem("isLoggedIn"));
 console.log("Token:", sessionStorage.getItem("authToken"));
 console.log("userId:", sessionStorage.getItem("userId"));
 console.log("documentValue:", sessionStorage.getItem("documentValue"));
+console.log("firstName:", sessionStorage.getItem("firstName"));
+console.log("lastName:", sessionStorage.getItem("lastName"));
+console.log("userFullName:", sessionStorage.getItem("userFullName"));
+console.log("userRating:", sessionStorage.getItem("userRating"));
 console.log("Roles:", sessionStorage.getItem("userRoles"));
 console.log("Permisos:", sessionStorage.getItem("userPermissions"));
 console.log("Disponibilidad:", sessionStorage.getItem("userAvailability"));
 console.log("============================");
+
+// Función de depuración para el botón X del modal
+function debugCloseButton() {
+    const modal = document.getElementById('driver-modal');
+    const closeBtn = document.querySelector('.close-modal');
+    
+    console.log('Modal element:', modal);
+    console.log('Close button element:', closeBtn);
+    
+    if (closeBtn) {
+        const styles = window.getComputedStyle(closeBtn);
+        console.log('Close button computed styles:', {
+            display: styles.display,
+            visibility: styles.visibility,
+            opacity: styles.opacity,
+            zIndex: styles.zIndex,
+            position: styles.position,
+            backgroundColor: styles.backgroundColor,
+            border: styles.border,
+            right: styles.right,
+            top: styles.top
+        });
+        
+        console.log('Close button should now be positioned correctly within the header');
+    } else {
+        console.error('Close button not found');
+    }
+}
+
+// Ejecutar después de que se cargue la página
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(debugCloseButton, 1000);
+});

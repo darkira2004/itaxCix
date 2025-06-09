@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 /* LOGIN CSS - Version Limpia */
 
 body {
@@ -7,7 +9,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Inter', 'SF Pro Display', 'Helvetica Neue', 'Arial', sans-serif;
   padding: 0;
   box-sizing: border-box;
   border-image-slice: 0%;
@@ -15,8 +17,8 @@ body {
 
 /* El contenedor del formulario */
 .login-container {
-  font-family: "Poppins", sans-serif;
-  background-color: #2b3962b6;
+  font-family: 'Inter', 'SF Pro Display', 'Helvetica Neue', 'Arial', sans-serif;
+  background-color: #2b396296;
   padding: 30px 25px;
   border-radius: 10px;
   box-shadow: 0 5px 20px rgba(47, 47, 47, 0.408);

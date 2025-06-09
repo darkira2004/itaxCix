@@ -9,6 +9,11 @@ class AppInitializer {
                 window.sidebarControllerInstance = new SidebarController();
             }
 
+            // Inicializar ProfileController
+            if (!window.profileControllerInstance) {
+                window.profileControllerInstance = new ProfileController();
+            }
+
             if (!window.uiControllerInstance) {
                 const app = new UIController();
                 app.init();

@@ -14,6 +14,21 @@ function saveSession(authData) {
   sessionStorage.setItem("userId", authData.userId.toString())
   sessionStorage.setItem("documentValue", authData.documentValue)
   
+  // Guardar información del nombre del usuario
+  if (authData.firstName) {
+    sessionStorage.setItem("firstName", authData.firstName)
+  }
+  if (authData.lastName) {
+    sessionStorage.setItem("lastName", authData.lastName)
+  }
+  if (authData.firstName || authData.lastName) {
+    const fullName = `${authData.firstName || ""} ${authData.lastName || ""}`.trim()
+    sessionStorage.setItem("userFullName", fullName)
+  }
+  if (authData.rating) {
+    sessionStorage.setItem("userRating", authData.rating.toString())
+  }
+  
   // Guardar roles y permisos
   if (authData.roles && authData.roles.length > 0) {
     sessionStorage.setItem("userRoles", JSON.stringify(authData.roles))
@@ -44,6 +59,12 @@ function logout() {
   sessionStorage.removeItem("userRoles")
   sessionStorage.removeItem("userPermissions")
   sessionStorage.removeItem("userAvailability")
+  
+  // Limpiar información del nombre del usuario
+  sessionStorage.removeItem("firstName")
+  sessionStorage.removeItem("lastName")
+  sessionStorage.removeItem("userFullName")
+  sessionStorage.removeItem("userRating")
 
   console.log("Sesión eliminada, redirigiendo...")
 
@@ -106,6 +127,44 @@ function hasPermission(permissionName) {
     console.error("Error al verificar permisos:", e)
     return false
   }
+}
+
+// Función para obtener información del usuario actual
+function getUserInfo() {
+  return {
+    userId: sessionStorage.getItem("userId"),
+    documentValue: sessionStorage.getItem("documentValue"),
+    firstName: sessionStorage.getItem("firstName"),
+    lastName: sessionStorage.getItem("lastName"),
+    fullName: sessionStorage.getItem("userFullName"),
+    rating: parseFloat(sessionStorage.getItem("userRating")) || 0,
+    roles: JSON.parse(sessionStorage.getItem("userRoles") || "[]"),
+    permissions: JSON.parse(sessionStorage.getItem("userPermissions") || "[]"),
+    availability: sessionStorage.getItem("userAvailability") === "true"
+  }
+}
+
+// Función para obtener el nombre completo del usuario
+function getUserFullName() {
+  const fullName = sessionStorage.getItem("userFullName")
+  const firstName = sessionStorage.getItem("firstName")
+  const lastName = sessionStorage.getItem("lastName")
+  
+  if (fullName && fullName.trim() !== "") {
+    return fullName.trim()
+  }
+  
+  if (firstName || lastName) {
+    return `${firstName || ""} ${lastName || ""}`.trim()
+  }
+  
+  return null
+}
+
+// Función para obtener el rating del usuario
+function getUserRating() {
+  const rating = sessionStorage.getItem("userRating")
+  return rating ? parseFloat(rating) : 0
 }
 
 // Exponer la función de logout globalmente
