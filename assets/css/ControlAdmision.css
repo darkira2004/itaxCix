@@ -103,18 +103,17 @@ body {
 
 /* Panel principal */
 .panel {
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(15px);
     border-radius: 8px;
-    overflow: visible;
-    border: 1px solid #e5e7eb;
-    border-left: 2px solid rgba(255, 255, 255, 0.074);
-    border-right: 2px solid rgba(255, 255, 255, 0.074);
-    box-shadow: 0 5px 20px rgba(47, 47, 47, 0.408);
+    overflow: hidden; /* Cambiar de visible a hidden */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 /* Contenedor de tabla responsive */
 .table-container {
-    overflow-x: visible;
+    overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }
 
@@ -122,84 +121,78 @@ body {
 .drivers-table {
     width: 100%;
     border-collapse: collapse;
-    background: linear-gradient(180deg, rgb(43, 57, 98) 0%, rgba(31, 42, 73, 0.8) 100%);
-    overflow: hidden;
-    min-width: 800px; /* Ancho mínimo que activará el scroll del panel */
+    background: transparent;
+    border-spacing: 0; /* Asegurar que no haya espaciado extra */
 }
 
-/* Encabezados sticky para mejor navegación en móviles */
-.drivers-table thead {
+.drivers-table th {
+    padding: 15px 20px;
+    text-align: left;
+    font-weight: 600;
+    vertical-align: middle;
+    color: #ffffff;
+    background: linear-gradient(135deg, rgba(43, 57, 98, 0.9) 0%, rgba(31, 42, 73, 0.9) 100%);
+    border: none; /* Eliminar bordes que causan divisiones */
+    letter-spacing: 0.025em;
+    font-size: 0.95em;
     position: sticky;
     top: 0;
     z-index: 10;
 }
 
-.drivers-table th {
-    padding: 12px 15px;
-    text-align: left;
-    font-weight: 600;
-    vertical-align: middle;    color: #ffffff;
-    background: rgba(43, 57, 98, 0.7);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid #e5e7eb;
-    letter-spacing: 0.025em;
-    font-size: 0.95em;
-    position: sticky;
-    top: 0;
-}
-
-/* Definir anchos específicos para las columnas */
-.drivers-table th:nth-child(1) { width: 300px; } /* Nombre - ancho fijo */
-.drivers-table th:nth-child(2) { width: 150px; } /* DNI - ancho fijo */
-.drivers-table th:nth-child(3) { width: 120px; } /* Placa - ancho fijo */
-.drivers-table th:nth-child(4) { width: 180px; } /* Contacto - ancho fijo */
-.drivers-table th:nth-child(5) { width: 150px; } /* Acciones - ancho fijo */
+/* Definir anchos específicos mejorados */
+.drivers-table th:nth-child(1) { width: 35%; min-width: 250px; } /* Nombre */
+.drivers-table th:nth-child(2) { width: 15%; min-width: 120px; } /* DNI */
+.drivers-table th:nth-child(3) { width: 15%; min-width: 100px; } /* Placa */
+.drivers-table th:nth-child(4) { width: 20%; min-width: 180px; } /* Contacto */
+.drivers-table th:nth-child(5) { width: 15%; min-width: 150px; } /* Acciones */
 
 .drivers-table td {
-    padding: 15px;
-    border-bottom: 1px solid #e5e7eb;
+    padding: 15px 20px;
+    border: none; /* Eliminar bordes individuales */
+    border-bottom: 1px solid rgba(229, 231, 235, 0.5); /* Solo borde inferior sutil */
     vertical-align: middle;
-    height: 60px;
-    overflow: hidden;
-    background: #ffffff;
+    height: auto; /* Cambiar de altura fija a auto */
+    min-height: 60px;
+    background: transparent;
     color: #374151;
 }
 
 .driver-row {
-    background: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
+    background: rgba(255, 255, 255, 0.8);
+    transition: all 0.2s ease;
 }
 
 .driver-row:nth-child(even) {
-    background: #f8fafc;
+    background: rgba(248, 250, 252, 0.8);
 }
 
 .driver-row:hover {
-    background: #f1f5f9;
+    background: rgba(241, 245, 249, 0.9);
     transform: none;
 }
 
-/* Columna de nombre con avatar */
+/* Columna de nombre con avatar mejorada */
 .driver-name {
     display: flex;
     align-items: center;
-    gap: 12px;
-    height: 100%;
+    gap: 15px;
+    width: 100%;
     min-height: 50px;
-    width: 100%; /* Asegurar que use todo el ancho disponible */
 }
 
-.avatar {    width: 40px;
-    height: 40px;
-    border-radius: 50%;    overflow: hidden;
-    background: rgba(43, 57, 98, 0.6);
-    backdrop-filter: blur(12px);
+.avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(43, 57, 98, 0.8) 0%, rgba(31, 42, 73, 0.8) 100%);
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid rgba(255, 255, 255, 0.074);
-    box-shadow: 0 3px 10px rgba(47, 47, 47, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .avatar img {
@@ -212,30 +205,31 @@ body {
     flex: 1;
     font-weight: 500;
     color: #374151;
-    line-height: 1.2;
+    line-height: 1.3;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     letter-spacing: 0.01em;
+    font-size: 14px;
 }
 
-/* Botones de acción */
+/* Botones de acción mejorados */
 .actions {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     justify-content: center;
     align-items: center;
     white-space: nowrap;
-    padding: 5px;
+    padding: 0;
 }
 
 .actions .btn {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     padding: 0;
     margin: 0;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -243,12 +237,10 @@ body {
     transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
-    min-height: 32px;
-    min-width: 32px;
 }
 
 .actions .btn i {
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1;
     position: relative;
     z-index: 1;
@@ -608,307 +600,103 @@ body {
     .main-content {
         margin-left: 0;
         width: 100%;
-    }    .content {
+    }
+    
+    .content {
         padding: 15px;
-        overflow-x: auto;
     }
 
     .panel {
         margin: 0;
         border-radius: 8px;
-        overflow: visible;
-    }
-      .top-bar h1 {
-        font-size: 1.3rem;
-        margin-left: 15px;
-    }      .top-bar h3 {
-        font-size: 0.85rem;
-        margin-left: 15px;
-        color: #ffffff !important;
-    }
-      .modal-content {
-        width: 95%;
-        max-width: 600px;
-        margin: 2% auto;
-    }    /* Mejorar la X del modal en tablets */
-    .close-modal {
-        right: 10px !important;
-        width: 45px !important;
-        height: 45px !important;
-        font-size: 30px !important;
-        background-color: rgba(255, 255, 255, 0.2) !important;
-        border: 2px solid rgba(255, 255, 255, 0.5) !important;
-    }    .close-modal:hover {
-        background-color: rgba(255, 255, 255, 0.35) !important;
-        border-color: rgba(255, 255, 255, 0.7) !important;
     }
     
-    .driver-info {
-        grid-template-columns: 1fr;
-        gap: 12px;
+    .drivers-table th,
+    .drivers-table td {
+        padding: 12px 15px;
+    }
+    
+    .avatar {
+        width: 40px;
+        height: 40px;
     }
 }
 
 @media (max-width: 768px) {
-    /* Contenido con scroll en tablets */
-    .content {
-        overflow-x: auto;
-    }
-    
-    /* Panel sin scroll propio */
-    .panel {
-        overflow: visible;
-    }
-    
-    /* Limitar ancho del nombre del conductor en tablets y móviles */
-    .driver-name span {
-        max-width: 120px;
-    }
-    
-    /* Tabla mantiene ancho mínimo */
-    .drivers-table {
-        min-width: 700px;
-    }
-    
-    /* Ajustes de la tabla */
-    .drivers-table {
-        font-size: 14px;
-    }
-    
-    /* Ocultar columna de contacto en pantallas medianas */
+    /* Ocultar columna de contacto */
     .drivers-table th:nth-child(4),
     .drivers-table td:nth-child(4) {
         display: none;
     }
     
-    /* Reajustar anchos sin la columna de contacto */
-    .drivers-table th:nth-child(1) { width: 350px; } /* Nombre */
-    .drivers-table th:nth-child(2) { width: 150px; } /* DNI */
-    .drivers-table th:nth-child(3) { width: 120px; } /* Placa */
-    .drivers-table th:nth-child(5) { width: 180px; } /* Acciones */
+    /* Reajustar anchos */
+    .drivers-table th:nth-child(1) { width: 45%; min-width: 200px; }
+    .drivers-table th:nth-child(2) { width: 20%; min-width: 100px; }
+    .drivers-table th:nth-child(3) { width: 20%; min-width: 80px; }
+    .drivers-table th:nth-child(5) { width: 15%; min-width: 120px; }
     
     .drivers-table th,
     .drivers-table td {
-        padding: 12px 8px;
+        padding: 10px 12px;
         font-size: 13px;
-    }
-    
-    .drivers-table th {
-        padding: 10px 8px;
-    }
-    
-    .drivers-table td {
-        height: 55px;
-    }
-    
-    .driver-name {
-        gap: 10px;
-        min-height: 45px;
     }
     
     .avatar {
         width: 35px;
         height: 35px;
     }
-      .driver-name span {
-        font-size: 14px;
-        line-height: 1.3;
-    }
     
-    /* Botones de acciones más grandes para touch */
-    .actions {
-        gap: 6px;
-        padding: 8px 4px;
-    }
-    
-    .actions .btn {
-        width: 34px;
-        height: 34px;
-        border-radius: 6px;
-    }
-    
-    .actions .btn i {
+    .driver-name span {
         font-size: 13px;
-    }
-    
-    /* Ajustes del modal */    .modal-content {
-        width: 98%;
-        margin: 1% auto;
-        max-height: 90vh;
-    }
-      .driver-details {
-        padding: 20px 15px;
-    }
-    
-    /* Mejorar la X del modal en móviles */
-    .close-modal {
-        right: 8px !important;
-        width: 50px !important;
-        height: 50px !important;
-        font-size: 32px !important;
-        background-color: rgba(255, 255, 255, 0.25) !important;
-        border: 3px solid rgba(255, 255, 255, 0.6) !important;
-        z-index: 9999 !important; /* Z-index muy alto */        text-shadow: 0 0 15px rgba(0, 0, 0, 0.9) !important;
-    }
-    
-    .close-modal:hover {
-        background-color: rgba(255, 255, 255, 0.4) !important;
-        transform: translateY(-50%) scale(1.05) !important;
-        border-color: rgba(255, 255, 255, 0.8) !important;
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.5) !important;
     }
 }
 
 @media (max-width: 640px) {
-    .content {
-        padding: 10px;
-        overflow-x: auto;
-    }
-    
-    .top-bar {
-        padding: 4px 15px;
-    }
-      .top-bar h1 {
-        font-size: 1.2rem;
-        margin-left: 10px;
-    }      .top-bar h3 {
-        font-size: 0.75rem;
-        margin-left: 10px;
-        color: #ffffff !important;
-    }
-      /* Ocultar nombre de usuario en móviles */
-    .user-display {
-        display: none !important;
-    }
-    
-    /* Ocultar rol de usuario en móviles */
-    .user-role {
-        display: none !important;
-    }
-    
-    /* Ajustar espaciado del perfil sin el nombre */
-    .profile-container {
-        min-width: auto !important;
-        gap: 6px !important;
-    }
-    
-    .user-info {
-        gap: 0 !important;
-    }
-      /* Panel sin scroll propio en móviles */
-    .panel {
-        overflow: visible;
-    }
-    
-    /* Tabla más compacta para móviles */
-    .drivers-table {
-        min-width: 500px;
-    }
-    
-    /* Rediseño de tabla para móviles */
-    /* Ocultar columna de placa también */
+    /* Ocultar también la columna de placa */
     .drivers-table th:nth-child(3),
     .drivers-table td:nth-child(3) {
         display: none;
     }
     
-    /* Reajustar anchos sin placa ni contacto */
-    .drivers-table th:nth-child(1) { width: 280px; } /* Nombre */
-    .drivers-table th:nth-child(2) { width: 120px; } /* DNI */
-    .drivers-table th:nth-child(5) { width: 100px; } /* Acciones */
+    /* Solo mostrar nombre, DNI y acciones */
+    .drivers-table th:nth-child(1) { width: 60%; min-width: 180px; }
+    .drivers-table th:nth-child(2) { width: 25%; min-width: 80px; }
+    .drivers-table th:nth-child(5) { width: 15%; min-width: 100px; }
     
     .drivers-table th,
     .drivers-table td {
-        padding: 10px 6px;
+        padding: 8px 10px;
         font-size: 12px;
-    }
-    
-    .drivers-table td {
-        height: 50px;
-    }
-    
-    .driver-name {
-        gap: 8px;
-        min-height: 40px;
     }
     
     .avatar {
         width: 32px;
         height: 32px;
     }
-      .driver-name span {
-        font-size: 13px;
+    
+    .driver-name {
+        gap: 10px;
     }
-      /* Botones de acciones más grandes para touch */
-    .actions {
-        gap: 6px;
-        padding: 8px 4px;
+    
+    .driver-name span {
+        font-size: 12px;
     }
     
     .actions .btn {
-        width: 30px;
-        height: 30px;
-        border-radius: 6px;
+        width: 32px;
+        height: 32px;
     }
     
     .actions .btn i {
         font-size: 12px;
     }
-    
-    /* Ajustes del modal */
-    .modal-content {
-        width: 98%;
-        margin: 1% auto;
-        max-height: 90vh;
-    }
-    
-    .driver-details {
-        padding: 20px 15px;    }    /* Mejorar la X del modal en móviles */
-    .close-modal {
-        right: 8px !important;
-        width: 50px !important;
-        height: 50px !important;
-        font-size: 32px !important;
-        background-color: rgba(255, 255, 255, 0.25) !important;
-        border: 2px solid rgba(255, 255, 255, 0.6) !important;
-    }
-    
-    .close-modal:hover {
-        background-color: rgba(255, 255, 255, 0.4) !important;
-        transform: translateY(-50%) scale(1.05) !important;
-        border-color: rgba(255, 255, 255, 0.8) !important;
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.5) !important;
-    }
 }
 
-@media (max-width: 480px) {    /* Ocultar nombre de usuario en móviles pequeños */
-    .user-display {
-        display: none !important;
-    }
-    
-    /* Ocultar rol de usuario en móviles pequeños */
-    .user-role {
-        display: none !important;
-    }
-    
-    /* Tabla ultra compacta */
-    .drivers-table {
-        font-size: 11px;
-    }
-    
+@media (max-width: 480px) {
     .drivers-table th,
     .drivers-table td {
-        padding: 8px 4px;
+        padding: 6px 8px;
         font-size: 11px;
-    }
-    
-    .drivers-table td {
-        height: 45px;
-    }
-    
-    .driver-name {
-        gap: 6px;
-        min-height: 35px;
     }
     
     .avatar {
@@ -917,86 +705,16 @@ body {
     }
     
     .driver-name span {
-        font-size: 12px;
-        line-height: 1.2;
-    }    .actions .btn {
-        width: 24px;
-        height: 24px;
-        font-size: 10px;
-    }
-      .actions .btn i {
-        font-size: 9px;
-    }
-    
-    /* Modal ajustes para pantallas muy pequeñas */
-    .modal-content {
-        width: 100%;
-        height: 100vh;
-        margin: 0;
-        border-radius: 0;
-        max-height: 100vh;
-    }
-      /* X del modal para pantallas muy pequeñas */
-    .close-modal {
-        right: 5px !important;
-        width: 55px !important;
-        height: 55px !important;
-        font-size: 36px !important;
-        background-color: rgba(255, 255, 255, 0.3) !important;
-        border: 4px solid rgba(255, 255, 255, 0.7) !important;
-        border-radius: 8px !important;
-        z-index: 9999 !important;
-        text-shadow: 0 0 20px rgba(0, 0, 0, 1) !important;
-    }
-    
-    .close-modal:hover {
-        background-color: rgba(255, 255, 255, 0.45) !important;
-        transform: translateY(-50%) scale(1.1) !important;
-        border-color: rgba(255, 255, 255, 0.9) !important;
-        box-shadow: 0 0 25px rgba(255, 255, 255, 0.6) !important;
-    }
-}
-
-@media (max-width: 360px) {    /* Ocultar nombre de usuario en móviles muy pequeños */
-    .user-display {
-        display: none !important;
-    }
-    
-    /* Ocultar rol de usuario en móviles muy pequeños */
-    .user-role {
-        display: none !important;
-    }
-    
-    /* Pantallas muy pequeñas */
-    .drivers-table th,
-    .drivers-table td {
-        padding: 6px 3px;
-        font-size: 10px;
-    }
-    
-    .drivers-table td {
-        height: 40px;
-    }
-    
-    .avatar {
-        width: 24px;
-        height: 24px;
-    }
-    
-    .driver-name span {
         font-size: 11px;
-    }    .actions .btn {
-        width: 20px;
-        height: 20px;
-        font-size: 9px;
+    }
+    
+    .actions .btn {
+        width: 28px;
+        height: 28px;
     }
     
     .actions .btn i {
-        font-size: 8px;
-    }
-    
-    .top-bar h1 {
-        font-size: 1rem;
+        font-size: 10px;
     }
 }
 
