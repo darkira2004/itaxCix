@@ -9,7 +9,7 @@
 body {
     background-image: url("../../assets/Recourse/Imagenes/loginFondo.png");
     background-size: auto;
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(0px);
     line-height: 1.6;
     height: 100vh;
     overflow: hidden;
@@ -43,7 +43,7 @@ body {
 
 /* Barra superior */
 .top-bar {
-    background: rgba(43, 57, 98, 0.916);
+    background: rgba(43, 57, 98, 0.601);
     backdrop-filter: blur(20px);
     padding: 4.2px 20px;
     display: flex;
@@ -80,7 +80,7 @@ body {
     overflow-x: auto;
     overflow-y: hidden;
     scrollbar-width: thin;
-    scrollbar-color: rgba(43, 57, 98, 0.4) rgba(0, 0, 0, 0.1);
+  
 }
 
 /* Barra de desplazamiento del contenido principal */
@@ -95,14 +95,11 @@ body {
 }
 
 .content::-webkit-scrollbar-thumb {
-    background: rgba(43, 57, 98, 0.6);
     border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.content::-webkit-scrollbar-thumb:hover {
-    background: rgba(43, 57, 98, 0.8);
-}
+
 
 /* Panel principal */
 .panel {
