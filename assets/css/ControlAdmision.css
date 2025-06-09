@@ -43,7 +43,7 @@ body {
 
 /* Barra superior */
 .top-bar {
-    background: rgba(43, 57, 98, 0.601);
+    background-color: #2b396296;
     backdrop-filter: blur(20px);
     padding: 4.2px 20px;
     display: flex;

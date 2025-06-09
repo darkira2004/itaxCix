@@ -18,7 +18,7 @@ body {
 /* El contenedor del formulario */
 .login-container {
   font-family: 'Inter', 'SF Pro Display', 'Helvetica Neue', 'Arial', sans-serif;
-  background-color: #2b396296;
+  background-color: #2b39627a;
   padding: 30px 25px;
   border-radius: 10px;
   box-shadow: 0 5px 20px rgba(47, 47, 47, 0.408);
