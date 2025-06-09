@@ -43,6 +43,9 @@ class LoginService {
       } catch (sslError) {
         console.warn('❌ HTTPS falló (problema SSL):', sslError.message);
         lastError = sslError;
+
+
+        
       }
 
       console.log('Status:', response.status, response.statusText);
@@ -107,7 +110,7 @@ class LoginService {
       
       // Si es un error de red (Failed to fetch), dar un mensaje más específico
       if (error.message === 'Failed to fetch') {
-        throw new Error('Error de conexión. Verifica tu internet o que el servidor esté disponible.');
+        throw new Error('El servidor esté disponible.');
       }
       
       throw error;

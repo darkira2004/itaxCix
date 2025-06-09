@@ -66,38 +66,114 @@ body {
 
 .top-bar h3 {
     margin-left: 20px;
-    font-size: 0.95rem;
+    font-size: 1.1rem; /* Reducir tamaño para mejor proporción */
     flex: 1;
     color: #ffffff !important;
     font-weight: 600;
     letter-spacing: 0.025em;
+    white-space: nowrap; /* Evitar salto de línea */
+    overflow: hidden; /* Ocultar desborde */
+    text-overflow: ellipsis; /* Mostrar ... si es muy largo */
+}
+
+/* Contenedor de perfil en top-bar */
+.top-bar .profile-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.2s ease;
+    min-width: 300px; /* Incrementar más para nombres largos */
+    max-width: 500px; /* Incrementar máximo para nombres muy largos */
+    margin-left: auto; /* Empujar a la derecha */
+    flex-shrink: 0; /* Evitar que se reduzca */
+}
+
+.top-bar .profile-container:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+/* Imagen de perfil en top-bar */
+.top-bar .profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(43, 57, 98, 0.8) 0%, rgba(31, 42, 73, 0.8) 100%);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    order: 2; /* Mover imagen a la derecha */
+    align-self: center; /* Centrar verticalmente */
+}
+
+/* Información del usuario */
+.top-bar .user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    min-width: 0;
+    flex: 1;
+    order: 1; /* Mantener texto a la izquierda */
+    height: 44px; /* Altura fija para centrado vertical */
+}
+
+.top-bar .user-info span {
+    display: block;
+    color: #ffffff;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: visible; /* Permitir que el texto se vea completo */
+    width: auto; /* Ancho automático para ajustarse al contenido */
+    font-weight: 500;
+    margin: 0; /* Resetear márgenes */
+}
+
+.top-bar .user-info span:first-child {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 1px; /* Reducir margen entre líneas */
+}
+
+.top-bar .user-info span:last-child {
+    font-size: 12px;
+    opacity: 0.9;
+    font-weight: 400;
+    margin-top: 1px; /* Pequeño margen superior para equilibrar */
+}
+
+.top-bar .user-display {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 2px;
+    max-width: 180px; /* Aumentar para nombres más largos */
+}
+
+.top-bar .user-role {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 400;
 }
 
 /* Contenido */
 .content {
     padding: 20px;
     flex: 1;
-    overflow-x: auto;
+    overflow-x: visible; /* Cambiar de auto a visible */
     overflow-y: hidden;
     scrollbar-width: thin;
   
 }
 
-/* Barra de desplazamiento del contenido principal */
-.content::-webkit-scrollbar {
-    height: 8px;
-}
-
-.content::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-    margin: 0 8px;
-}
-
-.content::-webkit-scrollbar-thumb {
-    border-radius: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
+/* Contenido sin barras de desplazamiento horizontal */
 
 
 
@@ -106,14 +182,14 @@ body {
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(15px);
     border-radius: 8px;
-    overflow: hidden; /* Cambiar de visible a hidden */
+    overflow: visible; /* Cambiar para eliminar scroll */
     border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 /* Contenedor de tabla responsive */
 .table-container {
-    overflow-x: auto;
+    overflow-x: visible; /* Cambiar de auto a visible */
     -webkit-overflow-scrolling: touch;
 }
 
@@ -623,6 +699,42 @@ body {
 }
 
 @media (max-width: 768px) {
+    /* Reducir padding del top-bar en móvil */
+    .top-bar {
+        padding: 4px 15px; /* Menos padding horizontal */
+    }
+    
+    /* Ajustar título para pantallas pequeñas */
+    .top-bar h3 {
+        font-size: 0.9rem; /* Reducir más en móvil */
+        margin-left: 10px; /* Menos margen */
+        letter-spacing: 0.01em; /* Menos espaciado entre letras */
+    }
+    
+    /* Ocultar información del usuario en móviles, solo mostrar imagen */
+    .top-bar .user-info {
+        display: none !important;
+    }
+    
+    /* Contenedor del perfil solo para la imagen */
+    .top-bar .profile-container {
+        min-width: auto !important;
+        max-width: 48px !important; /* Solo el tamaño de la imagen + padding */
+        width: 48px !important;
+        padding: 4px !important;
+        gap: 0 !important;
+        margin-left: auto !important; /* Mantener a la derecha */
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+    }
+    
+    .top-bar .profile-image {
+        width: 36px !important;
+        height: 36px !important;
+        order: 0 !important; /* Resetear order en móvil */
+        margin: 0 !important;
+    }
+    
     /* Ocultar columna de contacto */
     .drivers-table th:nth-child(4),
     .drivers-table td:nth-child(4) {
@@ -652,6 +764,31 @@ body {
 }
 
 @media (max-width: 640px) {
+    /* Título más pequeño para pantallas muy pequeñas */
+    .top-bar h3 {
+        font-size: 0.8rem; /* Aún más pequeño */
+        margin-left: 8px;
+        letter-spacing: 0;
+    }
+    
+    /* Continuar ocultando información del usuario */
+    .top-bar .user-info {
+        display: none !important;
+    }
+    
+    .top-bar .profile-container {
+        min-width: auto !important;
+        max-width: 44px !important;
+        width: 44px !important;
+        padding: 4px !important;
+        justify-content: center !important;
+    }
+    
+    .top-bar .profile-image {
+        width: 32px !important;
+        height: 32px !important;
+    }
+    
     /* Ocultar también la columna de placa */
     .drivers-table th:nth-child(3),
     .drivers-table td:nth-child(3) {
@@ -693,6 +830,31 @@ body {
 }
 
 @media (max-width: 480px) {
+    /* Título mínimo para pantallas muy pequeñas */
+    .top-bar h3 {
+        font-size: 0.75rem; /* Tamaño mínimo */
+        margin-left: 5px;
+        letter-spacing: -0.01em; /* Espaciado negativo para ahorrar espacio */
+    }
+    
+    /* Continuar ocultando información del usuario */
+    .top-bar .user-info {
+        display: none !important;
+    }
+    
+    .top-bar .profile-container {
+        min-width: auto !important;
+        max-width: 40px !important;
+        width: 40px !important;
+        padding: 4px !important;
+        justify-content: center !important;
+    }
+    
+    .top-bar .profile-image {
+        width: 28px !important;
+        height: 28px !important;
+    }
+    
     .drivers-table th,
     .drivers-table td {
         padding: 6px 8px;
@@ -747,6 +909,21 @@ body {
     
     .top-bar h1 {
         font-size: 1rem;
+    }
+    
+    /* Ocultar información del usuario en landscape */
+    .top-bar .user-info {
+        display: none;
+    }
+    
+    .top-bar .profile-container {
+        min-width: auto;
+        padding: 2px;
+    }
+    
+    .top-bar .profile-image {
+        width: 24px;
+        height: 24px;
     }
     
     .content {
