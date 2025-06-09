@@ -43,33 +43,6 @@ class LoginService {
       } catch (sslError) {
         console.warn('❌ HTTPS falló (problema SSL):', sslError.message);
         lastError = sslError;
-        
-        // Estrategia 2: Intentar con HTTP (menos seguro pero puede funcionar)
-        const httpUrl = this.baseUrl.replace('https://', 'http://');
-        console.log('🔓 Intentando HTTP sin SSL...');
-        try {
-          response = await fetch(`${httpUrl}/auth/login`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-            body: JSON.stringify(loginData)
-          });
-          console.log('✅ HTTP exitoso');
-        } catch (httpError) {
-          console.warn('❌ HTTP también falló:', httpError.message);
-          
-          // Si ambos fallan, lanzar error específico sobre SSL
-          if (sslError.message.includes('ERR_CERT_AUTHORITY_INVALID') || 
-              sslError.message.includes('certificate') ||
-              sslError.message.includes('SSL') ||
-              sslError.message.includes('TLS')) {
-            throw new Error('Error de certificado SSL del servidor. Contacta al administrador o prueba acceder directamente a: ' + this.baseUrl);
-          }
-          
-          throw httpError;
-        }
       }
 
       console.log('Status:', response.status, response.statusText);
