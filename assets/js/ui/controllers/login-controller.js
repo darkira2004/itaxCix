@@ -103,11 +103,9 @@ class LoginController {
                 sessionStorage.setItem("userFullName", `${response.firstName || ""} ${response.lastName || ""}`.trim());
                 sessionStorage.setItem("userRating", response.rating?.toString() || "0");
                 
-                sessionStorage.setItem("loginTime", Date.now().toString());
-
-                // Prevenir navegación hacia atrás y redirigir
+                sessionStorage.setItem("loginTime", Date.now().toString());                // Prevenir navegación hacia atrás y redirigir
                 window.history.pushState(null, '', window.location.href);
-                window.location.replace(`${this.baseUrl}/pages/usuarios/ControlAdmisionConductores.html`);
+                window.location.replace(`${this.baseUrl}/pages/Admision/ControlAdmisionConductores.html`);
             } else {
                 this.showError("Error en la respuesta del servidor. Inténtalo de nuevo.");
             }        } catch (error) {

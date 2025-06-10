@@ -1,86 +1,115 @@
 #!/bin/bash
 
-# Script automatizado para subir cambios a GitHub - PanelWeb
-# Uso: ./subir.sh [mensaje-opcional]
+# Script para subir cambios automáticamente a GitHub
+# Archivo: subir.sh
+# Uso: ./subir.sh "mensaje del commit"
 
-echo "🚀 INICIANDO SUBIDA AUTOMATICA A GITHUB - PanelWeb"
-echo "================================================="
+# Colores para output
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
 
-# Verificar si estamos en un repositorio Git
+# Función para mostrar mensajes con color
+print_message() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+print_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+# Verificar si estamos en un repositorio git
 if [ ! -d ".git" ]; then
-    echo "❌ ERROR: No se detectó un repositorio Git en este directorio"
-    echo "💡 Ejecuta primero: git init"
-    exit 1
+    print_error "Este directorio no es un repositorio Git."
+    print_message "Inicializando repositorio Git..."
+    git init
+    git remote add origin https://github.com/tu-usuario/PanelWeb.git
+    print_warning "¡IMPORTANTE! Actualiza la URL del repositorio en este script."
 fi
 
-# Verificar estado del repositorio
-echo "📊 Verificando estado del repositorio..."
-git status
+# Mensaje del commit (usar parámetro o mensaje por defecto)
+if [ -z "$1" ]; then
+    COMMIT_MESSAGE="Actualización automática - $(date '+%Y-%m-%d %H:%M:%S')"
+else
+    COMMIT_MESSAGE="$1"
+fi
 
-# Mostrar archivos modificados
-echo ""
-echo "📝 Archivos modificados detectados:"
-git diff --name-only
+print_message "Iniciando proceso de subida a GitHub..."
+echo "=================================="
 
-# Agregar todos los cambios
+# Mostrar estado actual
+print_message "Estado actual del repositorio:"
+git status --short
+
 echo ""
-echo "➕ Agregando todos los cambios..."
+
+# Agregar todos los archivos
+print_message "Agregando archivos al staging area..."
 git add .
 
 # Verificar si hay cambios para commitear
-if [ -z "$(git diff --cached --name-only)" ]; then
-    echo "✅ No hay cambios nuevos para subir"
+if git diff --staged --quiet; then
+    print_warning "No hay cambios para commitear."
     exit 0
 fi
 
-# Generar mensaje de commit
-if [ -n "$1" ]; then
-    COMMIT_MESSAGE="$1"
-else
-    TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-    COMMIT_MESSAGE="Actualización automática - $TIMESTAMP"
-fi
+# Mostrar archivos que se van a commitear
+print_message "Archivos que se van a commitear:"
+git diff --staged --name-only
 
-# Realizar commit
 echo ""
-echo "📦 Realizando commit con mensaje: '$COMMIT_MESSAGE'"
+
+# Hacer commit
+print_message "Creando commit con mensaje: '$COMMIT_MESSAGE'"
 git commit -m "$COMMIT_MESSAGE"
 
-# Verificar si el commit fue exitoso
 if [ $? -ne 0 ]; then
-    echo "❌ ERROR: Falló el commit"
+    print_error "Error al crear el commit."
     exit 1
 fi
 
-# Obtener rama actual
+# Verificar rama actual
 CURRENT_BRANCH=$(git branch --show-current)
-echo "🌿 Rama actual: $CURRENT_BRANCH"
+print_message "Rama actual: $CURRENT_BRANCH"
 
-# Intentar push
-echo ""
-echo "⬆️ Subiendo cambios a GitHub..."
-git push origin "$CURRENT_BRANCH"
+# Subir cambios
+print_message "Subiendo cambios a GitHub (rama: $CURRENT_BRANCH)..."
+git push origin $CURRENT_BRANCH
 
-# Verificar si el push fue exitoso
 if [ $? -eq 0 ]; then
-    echo ""
-    echo "✅ ¡ÉXITO! Cambios subidos correctamente a GitHub"
-    echo "🔗 Repositorio actualizado en la rama: $CURRENT_BRANCH"
+    print_success "¡Cambios subidos exitosamente a GitHub!"
+    print_success "Commit: $COMMIT_MESSAGE"
+    print_success "Rama: $CURRENT_BRANCH"
 else
-    echo ""
-    echo "❌ ERROR: Falló la subida a GitHub"
-    echo "💡 Posibles soluciones:"
-    echo "   - Verifica tu conexión a internet"
-    echo "   - Verifica que tengas permisos en el repositorio"
-    echo "   - Ejecuta: git remote -v para verificar el origen"
-    exit 1
+    print_error "Error al subir cambios a GitHub."
+    print_message "Intentando hacer push con --set-upstream..."
+    git push --set-upstream origin $CURRENT_BRANCH
+    
+    if [ $? -eq 0 ]; then
+        print_success "¡Cambios subidos exitosamente con --set-upstream!"
+    else
+        print_error "No se pudieron subir los cambios. Verifica tu conexión y credenciales."
+        exit 1
+    fi
 fi
 
-# Mostrar log de los últimos commits
-echo ""
-echo "📜 Últimos commits:"
-git log --oneline -5
+echo "=================================="
+print_success "Proceso completado."
 
+# Mostrar resumen final
 echo ""
-echo "🎉 PROCESO COMPLETADO"
-echo "================================================="
+print_message "Resumen:"
+echo "- Commit: $COMMIT_MESSAGE"
+echo "- Rama: $CURRENT_BRANCH"
+echo "- Archivos actualizados: $(git diff HEAD~1 --name-only | wc -l)"
+print_message "Ver cambios en: https://github.com/tu-usuario/PanelWeb/commit/$(git rev-parse HEAD)"
