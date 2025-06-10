@@ -152,8 +152,8 @@
 }
 
 .sidebar-menu .submenu li a {
-    padding: 8px 2px;
-    margin: 2px 8px;
+    padding: 8px 11px;
+    margin: 2px 2px;
     transition: all 0.2s ease;
     white-space: nowrap;
     display: flex;
