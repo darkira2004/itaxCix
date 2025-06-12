@@ -193,7 +193,7 @@ body {
 .drivers-table {
     width: 100%;
     border-collapse: collapse;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.95);
     border-spacing: 0; /* Asegurar que no haya espaciado extra */
     border: none; /* Eliminar cualquier borde de la tabla */
 }
@@ -223,7 +223,7 @@ body {
 .drivers-table td {
     padding: 15px 20px;
     border: none; /* Eliminar bordes individuales */
-    border-bottom: 1px solid rgba(229, 231, 235, 0.5); /* Solo borde inferior sutil */
+    border-bottom: 1px solid rgba(229, 231, 235, 0); /* Solo borde inferior sutil */
     vertical-align: middle;
     height: auto; /* Cambiar de altura fija a auto */
     min-height: 60px;
@@ -236,9 +236,7 @@ body {
     transition: all 0.2s ease;
 }
 
-.driver-row:nth-child(even) {
-    background: rgba(248, 250, 252, 0.8);
-}
+
 
 .driver-row:hover {
     background: rgba(241, 245, 249, 0.9);
@@ -569,7 +567,8 @@ body {
 }
 
 /* Grid de información */
-.driver-info {
+.driver-info,
+.admin-info {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 18px;
@@ -966,6 +965,10 @@ body {
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
 }
 
+
+
+
+
 /* Responsive */
 @media (max-width: 992px) {
     .main-content {
@@ -1055,8 +1058,7 @@ body {
     
     .driver-name span {
         font-size: 13px;
-    }
-      /* Responsive para modals en tablet */
+    }    /* Responsive para modals en tablet */
     .modal-content {
         width: 90%;
         max-width: 600px;
@@ -1125,7 +1127,8 @@ body {
         width: 32px;
         height: 32px;
     }
-      .driver-name span {
+    
+    .driver-name span {
         font-size: 12px;
         max-width: 200px; /* Aumentar límite con el nuevo sistema */
     }
